@@ -1,5 +1,11 @@
 import pandas as pd
 from eda import run_eda
+from evaluation import create_html_evaluation_report, evaluate_model_results
+from scoring import (
+    build_logit_scoring_model,
+    predictor_list_from_coefficients,
+    prepare_scoring_data,
+)
 
 credit_risk_df = pd.read_csv('credit_risk_dataset.csv')
 run_eda(credit_risk_df)
@@ -40,4 +46,23 @@ print(credit_risk_df[["emp_length", "person_age", "cb_person_cred_hist_length"]]
 # Some people in dataset are older than 120 years and have very long employment history. 
 # These outliers may be due to data entry errors and should be removed as non-realistic values
 credit_risk_df.drop(credit_risk_df[credit_risk_df["person_age"] > 120].index, inplace=True)
+
+print(credit_risk_df[["person_income"]].skew())
+# The distribution of person income is highly skewed, which is common for income data.
+# We are going to remove outliers more than 99th percentile to reduce the skewness and
+# make the distribution more normal for better model performance.
+income_99th_percentile = credit_risk_df[["person_income"]].quantile(0.99)
+credit_risk_df.drop(credit_risk_df[credit_risk_df["person_income"] > income_99th_percentile.iloc[0]].index, inplace=True)
 run_eda(credit_risk_df)
+
+scoring_model, scoring_predictors, scoring_coefficients = build_logit_scoring_model(credit_risk_df)
+print(predictor_list_from_coefficients(scoring_coefficients).to_string())
+print(scoring_predictors)
+
+X, y = prepare_scoring_data(credit_risk_df)
+evaluation = evaluate_model_results(scoring_model, X, y)
+print("\nModel evaluation summary:")
+for key, value in evaluation["metrics"].items():
+    print(f"{key}: {value:.4f}")
+
+create_html_evaluation_report(evaluation, save_dir="model_evaluation")

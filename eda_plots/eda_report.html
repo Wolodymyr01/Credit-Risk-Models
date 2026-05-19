@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EDA Summary Report</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 24px; color: #222; }
+h1, h2 { color: #333; }
+section { margin-bottom: 32px; }
+table.summary-table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+table.summary-table th, table.summary-table td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
+table.summary-table th { background: #f5f5f5; }
+td { white-space: pre-wrap; word-break: break-word; }
+figure { display: inline-block; margin: 12px; width: calc(50% - 24px); vertical-align: top; }
+figure img { width: 100%; height: auto; border: 1px solid #ddd; }
+figcaption { text-align: center; font-size: 0.9em; margin-top: 6px; color: #555; }
+</style>
+</head>
+<body>
+<header><h1>EDA Summary Report</h1>
+<p>Dataset shape: 32252 rows × 15 columns</p>
+<p>Numeric features: 8 | Categorical features: 7</p>
+</header>
+<section><h2>Numeric Feature Summary</h2><table class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: center;">
+      <th>feature</th>
+      <th>count</th>
+      <th>missing</th>
+      <th>missing_pct</th>
+      <th>min</th>
+      <th>q1</th>
+      <th>median</th>
+      <th>mean</th>
+      <th>q3</th>
+      <th>max</th>
+      <th>std</th>
+      <th>skew</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>person_age</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>20.00</td>
+      <td>23.00</td>
+      <td>26.00</td>
+      <td>27.665695</td>
+      <td>30.00</td>
+      <td>94.00</td>
+      <td>6.171340</td>
+      <td>1.957476</td>
+    </tr>
+    <tr>
+      <td>person_income</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>4000.00</td>
+      <td>38400.00</td>
+      <td>55000.00</td>
+      <td>62704.695585</td>
+      <td>78000.00</td>
+      <td>225000.00</td>
+      <td>34337.654189</td>
+      <td>1.406595</td>
+    </tr>
+    <tr>
+      <td>person_emp_length</td>
+      <td>31361</td>
+      <td>891</td>
+      <td>2.762619</td>
+      <td>0.00</td>
+      <td>2.00</td>
+      <td>4.00</td>
+      <td>4.768056</td>
+      <td>7.00</td>
+      <td>123.00</td>
+      <td>4.125676</td>
+      <td>2.650707</td>
+    </tr>
+    <tr>
+      <td>loan_amnt</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>500.00</td>
+      <td>5000.00</td>
+      <td>8000.00</td>
+      <td>9508.134379</td>
+      <td>12000.00</td>
+      <td>35000.00</td>
+      <td>6228.488906</td>
+      <td>1.176923</td>
+    </tr>
+    <tr>
+      <td>loan_int_rate</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>5.42</td>
+      <td>7.88</td>
+      <td>10.99</td>
+      <td>11.005570</td>
+      <td>13.48</td>
+      <td>23.22</td>
+      <td>3.210127</td>
+      <td>0.212362</td>
+    </tr>
+    <tr>
+      <td>loan_percent_income</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>0.01</td>
+      <td>0.09</td>
+      <td>0.15</td>
+      <td>0.171348</td>
+      <td>0.23</td>
+      <td>0.83</td>
+      <td>0.106643</td>
+      <td>1.063325</td>
+    </tr>
+    <tr>
+      <td>cb_person_cred_hist_length</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>2.00</td>
+      <td>3.00</td>
+      <td>4.00</td>
+      <td>5.770991</td>
+      <td>8.00</td>
+      <td>30.00</td>
+      <td>4.030913</td>
+      <td>1.666973</td>
+    </tr>
+    <tr>
+      <td>emp_length</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>2.00</td>
+      <td>4.00</td>
+      <td>4.636333</td>
+      <td>7.00</td>
+      <td>123.00</td>
+      <td>4.142667</td>
+      <td>2.599190</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Categorical Feature Summary</h2><table class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: center;">
+      <th>feature</th>
+      <th>count</th>
+      <th>missing</th>
+      <th>missing_pct</th>
+      <th>unique_values</th>
+      <th>top_values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>person_home_ownership</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>4</td>
+      <td>RENT (16380), MORTGAGE (13211), OWN (2557), OTHER (104)</td>
+    </tr>
+    <tr>
+      <td>loan_intent</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>6</td>
+      <td>EDUCATION (6407), MEDICAL (6010), VENTURE (5664), PERSONAL (5460), DEBTCONSOLIDATION (5155)</td>
+    </tr>
+    <tr>
+      <td>loan_grade</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7</td>
+      <td>A (10699), B (10347), C (6387), D (3573), E (947)</td>
+    </tr>
+    <tr>
+      <td>loan_status</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>0 (25184), 1 (7068)</td>
+    </tr>
+    <tr>
+      <td>cb_person_default_on_file</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>N (26583), Y (5669)</td>
+    </tr>
+    <tr>
+      <td>emp_length_missing</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>0 (31361), 1 (891)</td>
+    </tr>
+    <tr>
+      <td>int_rate_missing</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>0 (29160), 1 (3092)</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Bonferroni Outlier Summary</h2><table class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: center;">
+      <th>feature</th>
+      <th>count</th>
+      <th>outlier_count</th>
+      <th>outlier_pct</th>
+      <th>top_outliers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>person_age</td>
+      <td>32252</td>
+      <td>98</td>
+      <td>0.303857</td>
+      <td>32416:94.00, 32506:84.00, 32422:80.00, 32355:78.00, 32534:76.00</td>
+    </tr>
+    <tr>
+      <td>person_income</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>29513:225000.00, 29170:225000.00, 29169:225000.00, 29168:225000.00, 28900:225000.00</td>
+    </tr>
+    <tr>
+      <td>person_emp_length</td>
+      <td>31361</td>
+      <td>33</td>
+      <td>0.105226</td>
+      <td>0:123.00, 210:123.00, 32355:41.00, 32515:38.00, 32428:34.00</td>
+    </tr>
+    <tr>
+      <td>loan_amnt</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>0:35000.00, 1:1000.00, 2:5500.00, 3:35000.00, 4:35000.00</td>
+    </tr>
+    <tr>
+      <td>loan_int_rate</td>
+      <td>32252</td>
+      <td>0</td>
+      <td>0.000000</td>
+      <td>0:16.02, 1:11.14, 2:12.87, 3:15.23, 4:14.27</td>
+    </tr>
+    <tr>
+      <td>loan_percent_income</td>
+      <td>32252</td>
+      <td>14</td>
+      <td>0.043408</td>
+      <td>640:0.83, 23727:0.78, 577:0.77, 571:0.77, 18203:0.76</td>
+    </tr>
+    <tr>
+      <td>cb_person_cred_hist_length</td>
+      <td>32252</td>
+      <td>96</td>
+      <td>0.297656</td>
+      <td>32580:30.00, 32576:30.00, 32541:30.00, 32508:30.00, 32510:30.00</td>
+    </tr>
+    <tr>
+      <td>emp_length</td>
+      <td>32252</td>
+      <td>33</td>
+      <td>0.102319</td>
+      <td>0:123.00, 210:123.00, 32355:41.00, 32515:38.00, 32428:34.00</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Numeric Feature Visualizations</h2>
+<figure><img src="person_age_numeric.png" alt="person_age_numeric.png"><figcaption>person_age_numeric.png</figcaption></figure>
+<figure><img src="person_income_numeric.png" alt="person_income_numeric.png"><figcaption>person_income_numeric.png</figcaption></figure>
+<figure><img src="person_emp_length_numeric.png" alt="person_emp_length_numeric.png"><figcaption>person_emp_length_numeric.png</figcaption></figure>
+<figure><img src="loan_amnt_numeric.png" alt="loan_amnt_numeric.png"><figcaption>loan_amnt_numeric.png</figcaption></figure>
+<figure><img src="loan_int_rate_numeric.png" alt="loan_int_rate_numeric.png"><figcaption>loan_int_rate_numeric.png</figcaption></figure>
+<figure><img src="loan_percent_income_numeric.png" alt="loan_percent_income_numeric.png"><figcaption>loan_percent_income_numeric.png</figcaption></figure>
+<figure><img src="cb_person_cred_hist_length_numeric.png" alt="cb_person_cred_hist_length_numeric.png"><figcaption>cb_person_cred_hist_length_numeric.png</figcaption></figure>
+<figure><img src="emp_length_numeric.png" alt="emp_length_numeric.png"><figcaption>emp_length_numeric.png</figcaption></figure>
+</section>
+<section><h2>Categorical Feature Visualizations</h2>
+<figure><img src="person_home_ownership_categorical.png" alt="person_home_ownership_categorical.png"><figcaption>person_home_ownership_categorical.png</figcaption></figure>
+<figure><img src="loan_intent_categorical.png" alt="loan_intent_categorical.png"><figcaption>loan_intent_categorical.png</figcaption></figure>
+<figure><img src="loan_grade_categorical.png" alt="loan_grade_categorical.png"><figcaption>loan_grade_categorical.png</figcaption></figure>
+<figure><img src="loan_status_categorical.png" alt="loan_status_categorical.png"><figcaption>loan_status_categorical.png</figcaption></figure>
+<figure><img src="cb_person_default_on_file_categorical.png" alt="cb_person_default_on_file_categorical.png"><figcaption>cb_person_default_on_file_categorical.png</figcaption></figure>
+<figure><img src="emp_length_missing_categorical.png" alt="emp_length_missing_categorical.png"><figcaption>emp_length_missing_categorical.png</figcaption></figure>
+<figure><img src="int_rate_missing_categorical.png" alt="int_rate_missing_categorical.png"><figcaption>int_rate_missing_categorical.png</figcaption></figure>
+</section>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>Model Evaluation Report</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 24px; color: #222; }
+h1, h2 { color: #333; }
+section { margin-bottom: 32px; }
+table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+table th, table td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
+table th { background: #f5f5f5; }
+img { max-width: 100%; height: auto; border: 1px solid #ddd; margin-bottom: 12px; }
+figure { margin: 0 0 24px 0; }
+figcaption { color: #555; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<h1>Model Evaluation Report</h1>
+<table class="dataframe metrics-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>metric</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>accuracy</td>
+      <td>0.851575</td>
+    </tr>
+    <tr>
+      <td>precision</td>
+      <td>0.755775</td>
+    </tr>
+    <tr>
+      <td>recall</td>
+      <td>0.476797</td>
+    </tr>
+    <tr>
+      <td>f1_score</td>
+      <td>0.584714</td>
+    </tr>
+    <tr>
+      <td>specificity</td>
+      <td>0.956758</td>
+    </tr>
+    <tr>
+      <td>roc_auc</td>
+      <td>0.858562</td>
+    </tr>
+    <tr>
+      <td>average_precision</td>
+      <td>0.696251</td>
+    </tr>
+    <tr>
+      <td>brier_score</td>
+      <td>0.109837</td>
+    </tr>
+    <tr>
+      <td>ks_statistic</td>
+      <td>0.580678</td>
+    </tr>
+    <tr>
+      <td>threshold</td>
+      <td>0.500000</td>
+    </tr>
+    <tr>
+      <td>optimal_ks_threshold</td>
+      <td>0.260917</td>
+    </tr>
+  </tbody>
+</table>
+<section><h2>Confusion Matrix</h2>
+<table class="dataframe confusion-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Pred 0</th>
+      <th>Pred 1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Actual 0</th>
+      <td>24095</td>
+      <td>1089</td>
+    </tr>
+    <tr>
+      <th>Actual 1</th>
+      <td>3698</td>
+      <td>3370</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section><h2>Calibration Summary</h2>
+<table class="dataframe calibration-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>decile</th>
+      <th>mean_pred</th>
+      <th>actual_rate</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.005209</td>
+      <td>0.028518</td>
+      <td>3226</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>0.020609</td>
+      <td>0.028837</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.041457</td>
+      <td>0.054264</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.069629</td>
+      <td>0.072558</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.106750</td>
+      <td>0.088682</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0.157258</td>
+      <td>0.110388</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>0.226388</td>
+      <td>0.161240</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>0.322395</td>
+      <td>0.295194</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>0.480208</td>
+      <td>0.550078</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>0.779812</td>
+      <td>0.801612</td>
+      <td>3226</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section><h2>Lift Summary</h2>
+<table class="dataframe lift-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>decile</th>
+      <th>count</th>
+      <th>defaults</th>
+      <th>mean_score</th>
+      <th>default_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>3226</td>
+      <td>2586</td>
+      <td>0.779812</td>
+      <td>0.801612</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>3225</td>
+      <td>1774</td>
+      <td>0.480208</td>
+      <td>0.550078</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3225</td>
+      <td>952</td>
+      <td>0.322395</td>
+      <td>0.295194</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3225</td>
+      <td>520</td>
+      <td>0.226388</td>
+      <td>0.161240</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3225</td>
+      <td>356</td>
+      <td>0.157258</td>
+      <td>0.110388</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>3225</td>
+      <td>286</td>
+      <td>0.106750</td>
+      <td>0.088682</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>3225</td>
+      <td>234</td>
+      <td>0.069629</td>
+      <td>0.072558</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>3225</td>
+      <td>175</td>
+      <td>0.041457</td>
+      <td>0.054264</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>3225</td>
+      <td>93</td>
+      <td>0.020609</td>
+      <td>0.028837</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>3226</td>
+      <td>92</td>
+      <td>0.005209</td>
+      <td>0.028518</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Roc Curve</h2>
+<img src="roc_curve.png" alt="roc_curve.png">
+</section>
+<section>
+<h2>Pr Curve</h2>
+<img src="pr_curve.png" alt="pr_curve.png">
+</section>
+<section>
+<h2>Calibration Curve</h2>
+<img src="calibration_curve.png" alt="calibration_curve.png">
+</section>
+<section>
+<h2>Score Distribution</h2>
+<img src="score_distribution.png" alt="score_distribution.png">
+</section>
+</body>
+</html>
