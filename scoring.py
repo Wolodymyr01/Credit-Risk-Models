@@ -1,5 +1,5 @@
 import warnings
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
@@ -55,20 +55,27 @@ def prepare_scoring_data(
     return data.drop(columns=[target]), data[target].astype(int)
 
 
-def build_logit_scoring_model(
-    df: pd.DataFrame,
-    target: str = "loan_status",
-) -> Tuple[LogisticRegression, List[str], pd.Series]:
-    """Build a credit scoring model using logistic regression (logit link)."""
-    data, predictors = _prepare_scoring_features(df)
-    X = data.drop(columns=[target])
-    y = data[target].astype(int)
-
+def fit_logit_scoring_model(X: pd.DataFrame, y: pd.Series) -> LogisticRegression:
     model = LogisticRegression(C=1e12, solver="lbfgs", max_iter=1000)
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=ConvergenceWarning)
         model.fit(X, y)
+    return model
 
+
+def build_logit_scoring_model(
+    df: pd.DataFrame,
+    target: str = "loan_status",
+    selected_features: Optional[Iterable[str]] = None,
+) -> Tuple[LogisticRegression, List[str], pd.Series]:
+    """Build a credit scoring model using logistic regression (logit link)."""
+    data, _ = _prepare_scoring_features(df)
+    X = data.drop(columns=[target])
+    if selected_features is not None:
+        X = X[list(selected_features)]
+    y = data[target].astype(int)
+
+    model = fit_logit_scoring_model(X, y)
     coefficients = pd.Series(model.coef_[0], index=X.columns)
     ordered_predictors = list(coefficients.abs().sort_values(ascending=False).index)
     return model, ordered_predictors, coefficients
