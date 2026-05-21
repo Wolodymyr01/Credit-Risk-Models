@@ -1,68 +1,251 @@
 import pandas as pd
-from eda import run_eda
-from evaluation import create_html_evaluation_report, evaluate_model_results
+
+from eda import analyze_eda
+from eda_report import create_eda_report
+from evaluation import compare_evaluations, cross_validate_model, evaluate_model_results, segment_performance
+from evaluation_report import create_html_evaluation_report
+from sampling import (
+    effective_sample_size,
+    inverse_frequency_weights,
+    numeric_balance_diagnostics,
+    representative_sample_indices,
+    sampling_diagnostics,
+    weight_diagnostics,
+)
 from scoring import (
     build_logit_scoring_model,
+    dummy_feature_groups,
+    fit_logit_scoring_model,
     predictor_list_from_coefficients,
     prepare_scoring_data,
 )
 
-credit_risk_df = pd.read_csv('credit_risk_dataset.csv')
-run_eda(credit_risk_df)
-print(pd.isna(credit_risk_df).sum())
 
-# Loan interest rate and employment length have missing values. We can create new features to indicate
-# whether these values are missing or not and analyse their behaviour with respect to the target variable
-# 'loan_status'. This can help us understand if the missingness of these features is related to the likelihood of loan default.
-credit_risk_df["emp_length_missing"] = credit_risk_df["person_emp_length"].isna().astype(int)
-credit_risk_df["int_rate_missing"] = credit_risk_df["loan_int_rate"].isna().astype(int)
+def clean_credit_risk_data(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
 
-employment_length_missing = credit_risk_df.groupby("emp_length_missing")
-print(employment_length_missing["loan_status"].mean())
-print(employment_length_missing["person_income"].mean())
+    # Missing employment length is informative, so keep an indicator and impute the usable numeric input.
+    df["emp_length_missing"] = df["person_emp_length"].isna().astype(int)
+    df["int_rate_missing"] = df["loan_int_rate"].isna().astype(int)
+    df["emp_length"] = df["person_emp_length"].fillna(0)
 
-# The missingness of employment length seems to be associated with a higher likelihood of loan default
-# and lower income. This suggests that individuals with missing employment length data may be at a higher risk
-# of defaulting on their loans, possibly due to financial instability or lack of steady employment.
-# Missingness is not random and may be informative for our model. It cannot be ignored or imputed without
-# considering its potential impact on the target variable. We will fill it with 0 in a combination with missingness indicator.
-credit_risk_df["emp_length"] = credit_risk_df["person_emp_length"].fillna(0)
-print(credit_risk_df.groupby("int_rate_missing")["loan_status"].mean())
+    # Interest-rate missingness is weakly target-related; grade-level medians preserve risk ordering.
+    grade_median_int_rate = df.groupby("loan_grade")["loan_int_rate"].median()
+    df["loan_int_rate"] = df.apply(
+        lambda row: grade_median_int_rate[row["loan_grade"]]
+        if pd.isna(row["loan_int_rate"]) else row["loan_int_rate"],
+        axis=1,
+    )
 
-# The missingness of loan interest rate does not seem to be strongly associated with the likelihood of loan default.
-# It seems to be random (ETL job issues, not disclosed by the borrower, etc.) and may not provide useful information for our model.
-# It looks safe to impute the missing values with median of loan interest rate without worrying about introducing bias related to the target variable.
-grade_median_int_rate = credit_risk_df.groupby("loan_grade")["loan_int_rate"].median()
-credit_risk_df["loan_int_rate"] = credit_risk_df.apply(
-    lambda row: grade_median_int_rate[row["loan_grade"]]
-    if pd.isna(row["loan_int_rate"]) else row["loan_int_rate"],
-    axis=1,
-)
+    # These rows are implausible for consumer-credit modeling and distort age/employment diagnostics.
+    df = df[df["person_age"] <= 120]
 
-print(pd.isna(credit_risk_df).sum())
-# No missing values remain in the dataset after handling the missing data for 'person_emp_length' and 'loan_int_rate'.
+    income_99th_percentile = df["person_income"].quantile(0.99)
+    df = df[df["person_income"] <= income_99th_percentile]
+    return df
 
-print(credit_risk_df[["emp_length", "person_age", "cb_person_cred_hist_length"]].describe())
-# Some people in dataset are older than 120 years and have very long employment history. 
-# These outliers may be due to data entry errors and should be removed as non-realistic values
-credit_risk_df.drop(credit_risk_df[credit_risk_df["person_age"] > 120].index, inplace=True)
 
-print(credit_risk_df[["person_income"]].skew())
-# The distribution of person income is highly skewed, which is common for income data.
-# We are going to remove outliers more than 99th percentile to reduce the skewness and
-# make the distribution more normal for better model performance.
-income_99th_percentile = credit_risk_df[["person_income"]].quantile(0.99)
-credit_risk_df.drop(credit_risk_df[credit_risk_df["person_income"] > income_99th_percentile.iloc[0]].index, inplace=True)
-run_eda(credit_risk_df)
+def adjusted_features_from_significance(full_evaluation: dict, all_features: list[str]) -> tuple[list[str], list[str]]:
+    feature_groups = full_evaluation.get("feature_groups", {})
+    non_significant_groups = set(full_evaluation.get("non_significant_groups", []))
+    grouped_features_to_remove = {
+        feature
+        for group_name, features in feature_groups.items()
+        if group_name in non_significant_groups
+        for feature in features
+    }
+    ungrouped_features_to_remove = set(full_evaluation.get("non_significant_predictors", []))
+    removed_features = sorted((grouped_features_to_remove | ungrouped_features_to_remove) & set(all_features))
+    adjusted_features = [feature for feature in all_features if feature not in removed_features]
+    return adjusted_features, removed_features
 
-scoring_model, scoring_predictors, scoring_coefficients = build_logit_scoring_model(credit_risk_df)
-print(predictor_list_from_coefficients(scoring_coefficients).to_string())
-print(scoring_predictors)
 
-X, y = prepare_scoring_data(credit_risk_df)
-evaluation = evaluate_model_results(scoring_model, X, y)
-print("\nModel evaluation summary:")
-for key, value in evaluation["metrics"].items():
-    print(f"{key}: {value:.4f}")
+def main() -> None:
+    credit_risk_df = pd.read_csv("credit_risk_dataset.csv")
+    raw_eda = analyze_eda(credit_risk_df)
+    raw_eda_report = create_eda_report(credit_risk_df, raw_eda, save_dir="eda_plots/raw")
+    print(f"Raw EDA report saved to: {raw_eda_report}")
 
-create_html_evaluation_report(evaluation, save_dir="model_evaluation")
+    cleaned_df = clean_credit_risk_data(credit_risk_df)
+    cleaned_eda = analyze_eda(cleaned_df)
+    cleaned_eda_report = create_eda_report(cleaned_df, cleaned_eda, save_dir="eda_plots/cleaned")
+    print(f"Cleaned EDA report saved to: {cleaned_eda_report}")
+
+    scoring_model, scoring_predictors, scoring_coefficients = build_logit_scoring_model(cleaned_df)
+    print("Top model indicators by absolute coefficient:")
+    print(predictor_list_from_coefficients(scoring_coefficients).to_string())
+    print("\nOrdered predictors:")
+    print(scoring_predictors)
+
+    X, y = prepare_scoring_data(cleaned_df)
+    scoring_df = cleaned_df.loc[X.index]
+    feature_groups = dummy_feature_groups(X)
+    full_evaluation = evaluate_model_results(
+        scoring_model,
+        X,
+        y,
+        model_name="Full model",
+        feature_groups=feature_groups,
+    )
+    evaluations = [full_evaluation]
+    cross_validation_results = [
+        cross_validate_model(scoring_model, X, y, model_name="Full model")
+    ]
+    if not full_evaluation["group_likelihood_ratio_tests"].empty:
+        print("\nGrouped dummy-variable LR tests:")
+        print(full_evaluation["group_likelihood_ratio_tests"].to_string(index=False))
+
+    adjusted_features, removed_features = adjusted_features_from_significance(full_evaluation, list(X.columns))
+    if removed_features:
+        adjusted_model = fit_logit_scoring_model(X[adjusted_features], y)
+        adjusted_feature_groups = {
+            group_name: [feature for feature in features if feature in adjusted_features]
+            for group_name, features in feature_groups.items()
+            if any(feature in adjusted_features for feature in features)
+        }
+        adjusted_evaluation = evaluate_model_results(
+            adjusted_model,
+            X[adjusted_features],
+            y,
+            model_name="Adjusted grouped-LR model",
+            feature_groups=adjusted_feature_groups,
+        )
+        evaluations.append(adjusted_evaluation)
+        cross_validation_results.append(
+            cross_validate_model(
+                adjusted_model,
+                X[adjusted_features],
+                y,
+                model_name="Adjusted grouped-LR model",
+            )
+        )
+        print("\nFeatures removed in adjusted model:")
+        print(removed_features)
+        if full_evaluation["non_significant_groups"]:
+            print("\nNon-significant dummy groups removed by LR test:")
+            print(full_evaluation["non_significant_groups"])
+        if full_evaluation["non_significant_predictors"]:
+            print("\nNon-significant ungrouped indicators removed by Wald test:")
+            print(full_evaluation["non_significant_predictors"])
+    else:
+        adjusted_model = scoring_model
+        adjusted_features = list(X.columns)
+        adjusted_feature_groups = feature_groups
+        print("\nNo non-significant dummy groups or ungrouped indicators found at alpha 0.05.")
+
+    representative_index = representative_sample_indices(scoring_df)
+    representative_model = fit_logit_scoring_model(
+        X.loc[representative_index, adjusted_features],
+        y.loc[representative_index],
+    )
+    representative_evaluation = evaluate_model_results(
+        representative_model,
+        X[adjusted_features],
+        y,
+        model_name="Representative-sample adjusted model",
+        feature_groups=adjusted_feature_groups,
+        run_model_diagnostics=False,
+    )
+    evaluations.append(representative_evaluation)
+
+    def representative_fold_selector(X_train: pd.DataFrame, y_train: pd.Series, fold_index: int) -> pd.Index:
+        return representative_sample_indices(
+            scoring_df.loc[X_train.index],
+            random_state=42 + fold_index,
+        )
+
+    cross_validation_results.append(
+        cross_validate_model(
+            representative_model,
+            X[adjusted_features],
+            y,
+            model_name="Representative-sample adjusted model",
+            train_index_selector=representative_fold_selector,
+        )
+    )
+
+    sample_weights = inverse_frequency_weights(scoring_df).loc[X.index]
+    weighted_model = fit_logit_scoring_model(
+        X[adjusted_features],
+        y,
+        sample_weight=sample_weights,
+    )
+    weighted_evaluation = evaluate_model_results(
+        weighted_model,
+        X[adjusted_features],
+        y,
+        model_name="Weighted adjusted model",
+        feature_groups=adjusted_feature_groups,
+        run_model_diagnostics=False,
+    )
+    evaluations.append(weighted_evaluation)
+    cross_validation_results.append(
+        cross_validate_model(
+            weighted_model,
+            X[adjusted_features],
+            y,
+            model_name="Weighted adjusted model",
+            train_weight_provider=lambda X_train, _y_train, _fold_index: inverse_frequency_weights(
+                scoring_df.loc[X_train.index]
+            ),
+        )
+    )
+
+    sampling_report = {
+        "representative": {
+            "full_size": int(scoring_df.shape[0]),
+            "sample_size": int(len(representative_index)),
+            "sample_share": float(len(representative_index) / scoring_df.shape[0]),
+            "strata": sampling_diagnostics(scoring_df, representative_index),
+            "numeric_balance": numeric_balance_diagnostics(
+                scoring_df,
+                representative_index,
+                [
+                    "person_age",
+                    "person_income",
+                    "person_emp_length",
+                    "loan_amnt",
+                    "loan_int_rate",
+                    "cb_person_cred_hist_length",
+                ],
+            ),
+        },
+        "weighted": {
+            "mean_weight": float(sample_weights.mean()),
+            "min_weight": float(sample_weights.min()),
+            "max_weight": float(sample_weights.max()),
+            "effective_sample_size": effective_sample_size(sample_weights),
+            "strata": weight_diagnostics(scoring_df, sample_weights),
+        },
+    }
+
+    comparison = compare_evaluations(evaluations)
+    print("\nModel evaluation comparison:")
+    print(comparison.to_string(index=False))
+
+    cv_summary = pd.concat(
+        [result["summary"] for result in cross_validation_results],
+        ignore_index=True,
+    )
+    print("\nCross-validation summary:")
+    print(cv_summary.to_string(index=False))
+
+    segment_metrics = segment_performance(
+        evaluations,
+        scoring_df,
+        ["loan_grade", "loan_intent", "person_home_ownership"],
+    )
+
+    report_path = create_html_evaluation_report(
+        evaluations,
+        save_dir="model_evaluation",
+        comparison=comparison,
+        cross_validation=cross_validation_results,
+        sampling_diagnostics=sampling_report,
+        segment_performance=segment_metrics,
+    )
+    print(f"\nModel evaluation report saved to: {report_path}")
+
+
+if __name__ == "__main__":
+    main()
