@@ -34,9 +34,9 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
 </style>
 </head>
 <body>
-<header><h1>Model Evaluation Report</h1><p class='note'>Classification performance, statistical diagnostics, indicator significance, and adjusted-model comparison.</p></header>
+<header><h1>Model Evaluation Report</h1><p class='note'>Classification performance, statistical diagnostics, grouped dummy-variable tests, indicator significance, and adjusted-model comparison.</p></header>
 <main>
-<section><h2>Model Comparison</h2><p class='note'>The adjusted model is fitted after removing indicators that failed the Wald significance screen.</p><table class="dataframe comparison-table">
+<section><h2>Model Comparison</h2><p class='note'>The adjusted model removes whole dummy-variable groups that fail nested likelihood-ratio tests, plus ungrouped indicators that fail the Wald screen.</p><table class="dataframe comparison-table">
   <thead>
     <tr style="text-align: right;">
       <th>model</th>
@@ -63,15 +63,1752 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
       <td>0.3103</td>
     </tr>
     <tr>
-      <td>Adjusted significant-indicator model</td>
-      <td>19</td>
-      <td>0.8571</td>
-      <td>0.6967</td>
+      <td>Adjusted grouped-LR model</td>
+      <td>21</td>
+      <td>0.8577</td>
+      <td>0.6947</td>
       <td>0.1101</td>
-      <td>0.5768</td>
-      <td>23,536.1574</td>
-      <td>23,703.7841</td>
-      <td>0.3073</td>
+      <td>0.5815</td>
+      <td>23,531.4260</td>
+      <td>23,715.8154</td>
+      <td>0.3075</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>21</td>
+      <td>0.8567</td>
+      <td>0.6902</td>
+      <td>0.1108</td>
+      <td>0.5796</td>
+      <td>23,692.4433</td>
+      <td>23,876.8327</td>
+      <td>0.3028</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>21</td>
+      <td>0.7666</td>
+      <td>0.4583</td>
+      <td>0.1960</td>
+      <td>0.4240</td>
+      <td>37,099.1958</td>
+      <td>37,283.5851</td>
+      <td>-0.0925</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Sampling and Weighting Diagnostics</h2><h3>Representative Sample</h3><p class='note'>Sampled 16,152 of 32,252 rows (50.1%) using stratified proportional sampling.</p><table class="dataframe sampling-strata-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>stratum</th>
+      <th>full_count</th>
+      <th>sample_count</th>
+      <th>full_share</th>
+      <th>sample_share</th>
+      <th>share_diff</th>
+      <th>retained_share</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0 | A | EDUCATION | RENT</td>
+      <td>785</td>
+      <td>392</td>
+      <td>0.0243</td>
+      <td>0.0243</td>
+      <td>-0.0001</td>
+      <td>0.4994</td>
+    </tr>
+    <tr>
+      <td>0 | B | VENTURE | RENT</td>
+      <td>757</td>
+      <td>378</td>
+      <td>0.0235</td>
+      <td>0.0234</td>
+      <td>-0.0001</td>
+      <td>0.4993</td>
+    </tr>
+    <tr>
+      <td>0 | B | PERSONAL | RENT</td>
+      <td>689</td>
+      <td>344</td>
+      <td>0.0214</td>
+      <td>0.0213</td>
+      <td>-0.0001</td>
+      <td>0.4993</td>
+    </tr>
+    <tr>
+      <td>0 | A | VENTURE | RENT</td>
+      <td>621</td>
+      <td>310</td>
+      <td>0.0193</td>
+      <td>0.0192</td>
+      <td>-0.0001</td>
+      <td>0.4992</td>
+    </tr>
+    <tr>
+      <td>1 | B | DEBTCONSOLIDATION | OTHER</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>0 | C | VENTURE | OTHER</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | A | VENTURE | MORTGAGE</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | B | VENTURE | MORTGAGE</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | E | PERSONAL | OWN</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>0 | A | EDUCATION | OTHER</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | E | DEBTCONSOLIDATION | OTHER</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | B | DEBTCONSOLIDATION | OWN</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | C | PERSONAL | OTHER</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | B | PERSONAL | OTHER</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>0 | F | MEDICAL | RENT</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>1 | G | DEBTCONSOLIDATION | OWN</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>0.0001</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <td>0 | A | PERSONAL | RENT</td>
+      <td>553</td>
+      <td>276</td>
+      <td>0.0171</td>
+      <td>0.0171</td>
+      <td>-0.0001</td>
+      <td>0.4991</td>
+    </tr>
+    <tr>
+      <td>0 | C | DEBTCONSOLIDATION | RENT</td>
+      <td>461</td>
+      <td>230</td>
+      <td>0.0143</td>
+      <td>0.0142</td>
+      <td>-0.0001</td>
+      <td>0.4989</td>
+    </tr>
+    <tr>
+      <td>0 | C | EDUCATION | MORTGAGE</td>
+      <td>405</td>
+      <td>202</td>
+      <td>0.0126</td>
+      <td>0.0125</td>
+      <td>-0.0001</td>
+      <td>0.4988</td>
+    </tr>
+    <tr>
+      <td>0 | A | EDUCATION | MORTGAGE</td>
+      <td>992</td>
+      <td>496</td>
+      <td>0.0308</td>
+      <td>0.0307</td>
+      <td>-0.0000</td>
+      <td>0.5000</td>
+    </tr>
+  </tbody>
+</table><h3>Numeric Balance</h3><table class="dataframe numeric-balance-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>feature</th>
+      <th>full_mean</th>
+      <th>sample_mean</th>
+      <th>full_median</th>
+      <th>sample_median</th>
+      <th>standardized_mean_diff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>cb_person_cred_hist_length</td>
+      <td>5.7710</td>
+      <td>5.6396</td>
+      <td>4.0000</td>
+      <td>4.0000</td>
+      <td>-0.0327</td>
+    </tr>
+    <tr>
+      <td>person_age</td>
+      <td>27.6657</td>
+      <td>27.4900</td>
+      <td>26.0000</td>
+      <td>26.0000</td>
+      <td>-0.0286</td>
+    </tr>
+    <tr>
+      <td>person_emp_length</td>
+      <td>4.7681</td>
+      <td>4.7312</td>
+      <td>4.0000</td>
+      <td>4.0000</td>
+      <td>-0.0090</td>
+    </tr>
+    <tr>
+      <td>person_income</td>
+      <td>62,704.6956</td>
+      <td>62,406.5643</td>
+      <td>55,000.0000</td>
+      <td>55,000.0000</td>
+      <td>-0.0087</td>
+    </tr>
+    <tr>
+      <td>loan_amnt</td>
+      <td>9,508.1344</td>
+      <td>9,459.3858</td>
+      <td>8,000.0000</td>
+      <td>8,000.0000</td>
+      <td>-0.0079</td>
+    </tr>
+    <tr>
+      <td>loan_int_rate</td>
+      <td>11.0056</td>
+      <td>11.0110</td>
+      <td>10.9900</td>
+      <td>10.9900</td>
+      <td>0.0017</td>
+    </tr>
+  </tbody>
+</table><h3>Inverse-Frequency Weights</h3><p class='note'>Mean weight 1.0000; min 0.1275; max 126.4784; effective sample size 1219.</p><table class="dataframe weight-strata-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>stratum</th>
+      <th>count</th>
+      <th>mean_weight</th>
+      <th>min_weight</th>
+      <th>max_weight</th>
+      <th>total_weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0 | A | DEBTCONSOLIDATION | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | C | EDUCATION | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | C | HOMEIMPROVEMENT | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | A | MEDICAL | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | A | DEBTCONSOLIDATION | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | E | EDUCATION | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | G | VENTURE | RENT</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | E | VENTURE | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | F | HOMEIMPROVEMENT | OWN</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | F | PERSONAL | OWN</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | F | VENTURE | OWN</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>0 | D | EDUCATION | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | D | HOMEIMPROVEMENT | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | G | VENTURE | OWN</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | G | EDUCATION | OWN</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | D | PERSONAL | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | D | VENTURE | OWN</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | E | EDUCATION | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | E | HOMEIMPROVEMENT | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+    <tr>
+      <td>1 | E | PERSONAL | OTHER</td>
+      <td>1</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+      <td>126.4784</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Cross-Validation</h2><p class='note'>Stratified folds estimate out-of-sample stability. Higher is better except for Brier score.</p><table class="dataframe cv-summary-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>model</th>
+      <th>metric</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>max</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Full model</td>
+      <td>roc_auc</td>
+      <td>0.8569</td>
+      <td>0.0061</td>
+      <td>0.8506</td>
+      <td>0.8647</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>average_precision</td>
+      <td>0.6981</td>
+      <td>0.0087</td>
+      <td>0.6839</td>
+      <td>0.7040</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>brier_score</td>
+      <td>0.1099</td>
+      <td>0.0015</td>
+      <td>0.1081</td>
+      <td>0.1119</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>ks_statistic</td>
+      <td>0.5801</td>
+      <td>0.0092</td>
+      <td>0.5646</td>
+      <td>0.5870</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>f1_score</td>
+      <td>0.5869</td>
+      <td>0.0123</td>
+      <td>0.5671</td>
+      <td>0.5972</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>roc_auc</td>
+      <td>0.8562</td>
+      <td>0.0063</td>
+      <td>0.8495</td>
+      <td>0.8648</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>average_precision</td>
+      <td>0.6907</td>
+      <td>0.0111</td>
+      <td>0.6738</td>
+      <td>0.6997</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>brier_score</td>
+      <td>0.1111</td>
+      <td>0.0017</td>
+      <td>0.1095</td>
+      <td>0.1133</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>ks_statistic</td>
+      <td>0.5829</td>
+      <td>0.0064</td>
+      <td>0.5728</td>
+      <td>0.5882</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>f1_score</td>
+      <td>0.5703</td>
+      <td>0.0122</td>
+      <td>0.5540</td>
+      <td>0.5855</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>roc_auc</td>
+      <td>0.8562</td>
+      <td>0.0061</td>
+      <td>0.8500</td>
+      <td>0.8646</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>average_precision</td>
+      <td>0.6883</td>
+      <td>0.0075</td>
+      <td>0.6806</td>
+      <td>0.6991</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>brier_score</td>
+      <td>0.1112</td>
+      <td>0.0016</td>
+      <td>0.1090</td>
+      <td>0.1133</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>ks_statistic</td>
+      <td>0.5818</td>
+      <td>0.0074</td>
+      <td>0.5725</td>
+      <td>0.5890</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>f1_score</td>
+      <td>0.5699</td>
+      <td>0.0084</td>
+      <td>0.5586</td>
+      <td>0.5805</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>roc_auc</td>
+      <td>0.7715</td>
+      <td>0.0083</td>
+      <td>0.7614</td>
+      <td>0.7815</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>average_precision</td>
+      <td>0.4695</td>
+      <td>0.0089</td>
+      <td>0.4606</td>
+      <td>0.4825</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>brier_score</td>
+      <td>0.1975</td>
+      <td>0.0040</td>
+      <td>0.1936</td>
+      <td>0.2029</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>ks_statistic</td>
+      <td>0.4368</td>
+      <td>0.0184</td>
+      <td>0.4180</td>
+      <td>0.4614</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>f1_score</td>
+      <td>0.5178</td>
+      <td>0.0107</td>
+      <td>0.5096</td>
+      <td>0.5358</td>
+    </tr>
+  </tbody>
+</table><h3>Fold Results</h3><table class="dataframe cv-folds-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>model</th>
+      <th>fold</th>
+      <th>n_test</th>
+      <th>roc_auc</th>
+      <th>average_precision</th>
+      <th>brier_score</th>
+      <th>ks_statistic</th>
+      <th>accuracy</th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Full model</td>
+      <td>1</td>
+      <td>6451</td>
+      <td>0.8647</td>
+      <td>0.7038</td>
+      <td>0.1081</td>
+      <td>0.5844</td>
+      <td>0.8544</td>
+      <td>0.7660</td>
+      <td>0.4837</td>
+      <td>0.5930</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>2</td>
+      <td>6451</td>
+      <td>0.8564</td>
+      <td>0.6839</td>
+      <td>0.1119</td>
+      <td>0.5784</td>
+      <td>0.8455</td>
+      <td>0.7345</td>
+      <td>0.4618</td>
+      <td>0.5671</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>3</td>
+      <td>6450</td>
+      <td>0.8513</td>
+      <td>0.6957</td>
+      <td>0.1107</td>
+      <td>0.5646</td>
+      <td>0.8532</td>
+      <td>0.7541</td>
+      <td>0.4901</td>
+      <td>0.5941</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>4</td>
+      <td>6450</td>
+      <td>0.8506</td>
+      <td>0.7040</td>
+      <td>0.1095</td>
+      <td>0.5858</td>
+      <td>0.8561</td>
+      <td>0.7722</td>
+      <td>0.4869</td>
+      <td>0.5972</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>5</td>
+      <td>6450</td>
+      <td>0.8613</td>
+      <td>0.7032</td>
+      <td>0.1091</td>
+      <td>0.5870</td>
+      <td>0.8519</td>
+      <td>0.7608</td>
+      <td>0.4728</td>
+      <td>0.5832</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>1</td>
+      <td>6451</td>
+      <td>0.8648</td>
+      <td>0.6995</td>
+      <td>0.1095</td>
+      <td>0.5882</td>
+      <td>0.8481</td>
+      <td>0.7583</td>
+      <td>0.4505</td>
+      <td>0.5652</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>2</td>
+      <td>6451</td>
+      <td>0.8554</td>
+      <td>0.6738</td>
+      <td>0.1133</td>
+      <td>0.5806</td>
+      <td>0.8420</td>
+      <td>0.7268</td>
+      <td>0.4477</td>
+      <td>0.5540</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>3</td>
+      <td>6450</td>
+      <td>0.8512</td>
+      <td>0.6854</td>
+      <td>0.1124</td>
+      <td>0.5728</td>
+      <td>0.8473</td>
+      <td>0.7474</td>
+      <td>0.4583</td>
+      <td>0.5682</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>4</td>
+      <td>6450</td>
+      <td>0.8495</td>
+      <td>0.6950</td>
+      <td>0.1108</td>
+      <td>0.5853</td>
+      <td>0.8509</td>
+      <td>0.7595</td>
+      <td>0.4671</td>
+      <td>0.5784</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>5</td>
+      <td>6450</td>
+      <td>0.8602</td>
+      <td>0.6997</td>
+      <td>0.1096</td>
+      <td>0.5876</td>
+      <td>0.8522</td>
+      <td>0.7596</td>
+      <td>0.4763</td>
+      <td>0.5855</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>1</td>
+      <td>6451</td>
+      <td>0.8646</td>
+      <td>0.6991</td>
+      <td>0.1090</td>
+      <td>0.5871</td>
+      <td>0.8506</td>
+      <td>0.7545</td>
+      <td>0.4717</td>
+      <td>0.5805</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>2</td>
+      <td>6451</td>
+      <td>0.8586</td>
+      <td>0.6817</td>
+      <td>0.1116</td>
+      <td>0.5890</td>
+      <td>0.8456</td>
+      <td>0.7348</td>
+      <td>0.4625</td>
+      <td>0.5677</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>3</td>
+      <td>6450</td>
+      <td>0.8500</td>
+      <td>0.6806</td>
+      <td>0.1133</td>
+      <td>0.5725</td>
+      <td>0.8434</td>
+      <td>0.7311</td>
+      <td>0.4519</td>
+      <td>0.5586</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>4</td>
+      <td>6450</td>
+      <td>0.8506</td>
+      <td>0.6910</td>
+      <td>0.1107</td>
+      <td>0.5850</td>
+      <td>0.8488</td>
+      <td>0.7483</td>
+      <td>0.4671</td>
+      <td>0.5752</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>5</td>
+      <td>6450</td>
+      <td>0.8574</td>
+      <td>0.6892</td>
+      <td>0.1114</td>
+      <td>0.5753</td>
+      <td>0.8464</td>
+      <td>0.7403</td>
+      <td>0.4600</td>
+      <td>0.5674</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>1</td>
+      <td>6451</td>
+      <td>0.7780</td>
+      <td>0.4825</td>
+      <td>0.2029</td>
+      <td>0.4464</td>
+      <td>0.6790</td>
+      <td>0.3865</td>
+      <td>0.7914</td>
+      <td>0.5194</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>2</td>
+      <td>6451</td>
+      <td>0.7662</td>
+      <td>0.4616</td>
+      <td>0.1963</td>
+      <td>0.4194</td>
+      <td>0.6938</td>
+      <td>0.3933</td>
+      <td>0.7313</td>
+      <td>0.5115</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>3</td>
+      <td>6450</td>
+      <td>0.7614</td>
+      <td>0.4606</td>
+      <td>0.1936</td>
+      <td>0.4180</td>
+      <td>0.7034</td>
+      <td>0.3997</td>
+      <td>0.7030</td>
+      <td>0.5096</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>4</td>
+      <td>6450</td>
+      <td>0.7704</td>
+      <td>0.4706</td>
+      <td>0.2004</td>
+      <td>0.4387</td>
+      <td>0.6847</td>
+      <td>0.3875</td>
+      <td>0.7573</td>
+      <td>0.5127</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>5</td>
+      <td>6450</td>
+      <td>0.7815</td>
+      <td>0.4722</td>
+      <td>0.1942</td>
+      <td>0.4614</td>
+      <td>0.7126</td>
+      <td>0.4146</td>
+      <td>0.7573</td>
+      <td>0.5358</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Segment Stability</h2><p class='note'>Segment metrics show whether sampling or weighting improves stability across portfolio groups.</p><table class="dataframe segment-performance-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>model</th>
+      <th>segment</th>
+      <th>value</th>
+      <th>count</th>
+      <th>default_rate</th>
+      <th>mean_score</th>
+      <th>calibration_gap</th>
+      <th>roc_auc</th>
+      <th>average_precision</th>
+      <th>brier_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>A</td>
+      <td>10699</td>
+      <td>0.1002</td>
+      <td>0.1139</td>
+      <td>0.0137</td>
+      <td>0.8446</td>
+      <td>0.5289</td>
+      <td>0.0687</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>A</td>
+      <td>10699</td>
+      <td>0.1002</td>
+      <td>0.1122</td>
+      <td>0.0120</td>
+      <td>0.8466</td>
+      <td>0.5412</td>
+      <td>0.0681</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>A</td>
+      <td>10699</td>
+      <td>0.1002</td>
+      <td>0.1256</td>
+      <td>0.0254</td>
+      <td>0.8509</td>
+      <td>0.5467</td>
+      <td>0.0684</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>A</td>
+      <td>10699</td>
+      <td>0.1002</td>
+      <td>0.3929</td>
+      <td>0.2927</td>
+      <td>0.7725</td>
+      <td>0.2234</td>
+      <td>0.1842</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>B</td>
+      <td>10347</td>
+      <td>0.1638</td>
+      <td>0.1652</td>
+      <td>0.0014</td>
+      <td>0.8276</td>
+      <td>0.5844</td>
+      <td>0.1018</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>B</td>
+      <td>10347</td>
+      <td>0.1638</td>
+      <td>0.1642</td>
+      <td>0.0004</td>
+      <td>0.8283</td>
+      <td>0.5936</td>
+      <td>0.1013</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>B</td>
+      <td>10347</td>
+      <td>0.1638</td>
+      <td>0.1561</td>
+      <td>-0.0078</td>
+      <td>0.8304</td>
+      <td>0.5986</td>
+      <td>0.1014</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>B</td>
+      <td>10347</td>
+      <td>0.1638</td>
+      <td>0.4070</td>
+      <td>0.2431</td>
+      <td>0.7459</td>
+      <td>0.3033</td>
+      <td>0.1926</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>C</td>
+      <td>6387</td>
+      <td>0.2093</td>
+      <td>0.2046</td>
+      <td>-0.0048</td>
+      <td>0.7739</td>
+      <td>0.5624</td>
+      <td>0.1323</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>C</td>
+      <td>6387</td>
+      <td>0.2093</td>
+      <td>0.2133</td>
+      <td>0.0040</td>
+      <td>0.7740</td>
+      <td>0.5676</td>
+      <td>0.1321</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>C</td>
+      <td>6387</td>
+      <td>0.2093</td>
+      <td>0.1948</td>
+      <td>-0.0145</td>
+      <td>0.7764</td>
+      <td>0.5769</td>
+      <td>0.1312</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>C</td>
+      <td>6387</td>
+      <td>0.2093</td>
+      <td>0.4266</td>
+      <td>0.2173</td>
+      <td>0.7196</td>
+      <td>0.3585</td>
+      <td>0.2048</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>D</td>
+      <td>3573</td>
+      <td>0.5942</td>
+      <td>0.5872</td>
+      <td>-0.0070</td>
+      <td>0.7862</td>
+      <td>0.8526</td>
+      <td>0.1891</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>D</td>
+      <td>3573</td>
+      <td>0.5942</td>
+      <td>0.5790</td>
+      <td>-0.0152</td>
+      <td>0.7833</td>
+      <td>0.8508</td>
+      <td>0.1899</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>D</td>
+      <td>3573</td>
+      <td>0.5942</td>
+      <td>0.6146</td>
+      <td>0.0205</td>
+      <td>0.7718</td>
+      <td>0.8422</td>
+      <td>0.1977</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>D</td>
+      <td>3573</td>
+      <td>0.5942</td>
+      <td>0.5697</td>
+      <td>-0.0245</td>
+      <td>0.6752</td>
+      <td>0.7236</td>
+      <td>0.2238</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>E</td>
+      <td>947</td>
+      <td>0.6463</td>
+      <td>0.6510</td>
+      <td>0.0047</td>
+      <td>0.7729</td>
+      <td>0.8684</td>
+      <td>0.1926</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>E</td>
+      <td>947</td>
+      <td>0.6463</td>
+      <td>0.6432</td>
+      <td>-0.0030</td>
+      <td>0.7715</td>
+      <td>0.8675</td>
+      <td>0.1920</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>E</td>
+      <td>947</td>
+      <td>0.6463</td>
+      <td>0.6060</td>
+      <td>-0.0402</td>
+      <td>0.7666</td>
+      <td>0.8643</td>
+      <td>0.1950</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>E</td>
+      <td>947</td>
+      <td>0.6463</td>
+      <td>0.6023</td>
+      <td>-0.0440</td>
+      <td>0.6910</td>
+      <td>0.7849</td>
+      <td>0.2125</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>F</td>
+      <td>236</td>
+      <td>0.7076</td>
+      <td>0.6163</td>
+      <td>-0.0914</td>
+      <td>0.7281</td>
+      <td>0.8792</td>
+      <td>0.2125</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>F</td>
+      <td>236</td>
+      <td>0.7076</td>
+      <td>0.6149</td>
+      <td>-0.0928</td>
+      <td>0.7206</td>
+      <td>0.8754</td>
+      <td>0.2145</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>F</td>
+      <td>236</td>
+      <td>0.7076</td>
+      <td>0.5926</td>
+      <td>-0.1150</td>
+      <td>0.7178</td>
+      <td>0.8721</td>
+      <td>0.2192</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>F</td>
+      <td>236</td>
+      <td>0.7076</td>
+      <td>0.6271</td>
+      <td>-0.0806</td>
+      <td>0.7076</td>
+      <td>0.8258</td>
+      <td>0.1968</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_grade</td>
+      <td>G</td>
+      <td>63</td>
+      <td>0.9841</td>
+      <td>0.6569</td>
+      <td>-0.3272</td>
+      <td>0.7581</td>
+      <td>0.9957</td>
+      <td>0.1811</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_grade</td>
+      <td>G</td>
+      <td>63</td>
+      <td>0.9841</td>
+      <td>0.6630</td>
+      <td>-0.3212</td>
+      <td>0.7742</td>
+      <td>0.9960</td>
+      <td>0.1742</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_grade</td>
+      <td>G</td>
+      <td>63</td>
+      <td>0.9841</td>
+      <td>0.6389</td>
+      <td>-0.3452</td>
+      <td>0.7742</td>
+      <td>0.9960</td>
+      <td>0.1938</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_grade</td>
+      <td>G</td>
+      <td>63</td>
+      <td>0.9841</td>
+      <td>0.9344</td>
+      <td>-0.0497</td>
+      <td>0.8548</td>
+      <td>0.9975</td>
+      <td>0.0234</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_intent</td>
+      <td>DEBTCONSOLIDATION</td>
+      <td>5155</td>
+      <td>0.2867</td>
+      <td>0.2988</td>
+      <td>0.0121</td>
+      <td>0.8720</td>
+      <td>0.8275</td>
+      <td>0.1165</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_intent</td>
+      <td>DEBTCONSOLIDATION</td>
+      <td>5155</td>
+      <td>0.2867</td>
+      <td>0.2926</td>
+      <td>0.0059</td>
+      <td>0.8717</td>
+      <td>0.8241</td>
+      <td>0.1167</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_intent</td>
+      <td>DEBTCONSOLIDATION</td>
+      <td>5155</td>
+      <td>0.2867</td>
+      <td>0.2793</td>
+      <td>-0.0074</td>
+      <td>0.8715</td>
+      <td>0.8251</td>
+      <td>0.1161</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_intent</td>
+      <td>DEBTCONSOLIDATION</td>
+      <td>5155</td>
+      <td>0.2867</td>
+      <td>0.5204</td>
+      <td>0.2336</td>
+      <td>0.7578</td>
+      <td>0.5438</td>
+      <td>0.2315</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_intent</td>
+      <td>EDUCATION</td>
+      <td>6407</td>
+      <td>0.1728</td>
+      <td>0.1726</td>
+      <td>-0.0002</td>
+      <td>0.8176</td>
+      <td>0.5410</td>
+      <td>0.1105</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_intent</td>
+      <td>EDUCATION</td>
+      <td>6407</td>
+      <td>0.1728</td>
+      <td>0.1742</td>
+      <td>0.0014</td>
+      <td>0.8180</td>
+      <td>0.5413</td>
+      <td>0.1099</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_intent</td>
+      <td>EDUCATION</td>
+      <td>6407</td>
+      <td>0.1728</td>
+      <td>0.1739</td>
+      <td>0.0011</td>
+      <td>0.8140</td>
+      <td>0.5311</td>
+      <td>0.1119</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_intent</td>
+      <td>EDUCATION</td>
+      <td>6407</td>
+      <td>0.1728</td>
+      <td>0.3950</td>
+      <td>0.2222</td>
+      <td>0.7419</td>
+      <td>0.3404</td>
+      <td>0.1853</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_intent</td>
+      <td>HOMEIMPROVEMENT</td>
+      <td>3556</td>
+      <td>0.2635</td>
+      <td>0.2983</td>
+      <td>0.0348</td>
+      <td>0.8429</td>
+      <td>0.7118</td>
+      <td>0.1300</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_intent</td>
+      <td>HOMEIMPROVEMENT</td>
+      <td>3556</td>
+      <td>0.2635</td>
+      <td>0.2879</td>
+      <td>0.0244</td>
+      <td>0.8429</td>
+      <td>0.7110</td>
+      <td>0.1290</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_intent</td>
+      <td>HOMEIMPROVEMENT</td>
+      <td>3556</td>
+      <td>0.2635</td>
+      <td>0.2952</td>
+      <td>0.0317</td>
+      <td>0.8397</td>
+      <td>0.7034</td>
+      <td>0.1317</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_intent</td>
+      <td>HOMEIMPROVEMENT</td>
+      <td>3556</td>
+      <td>0.2635</td>
+      <td>0.4208</td>
+      <td>0.1573</td>
+      <td>0.7366</td>
+      <td>0.4471</td>
+      <td>0.1989</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_intent</td>
+      <td>MEDICAL</td>
+      <td>6010</td>
+      <td>0.2672</td>
+      <td>0.2581</td>
+      <td>-0.0091</td>
+      <td>0.8758</td>
+      <td>0.7947</td>
+      <td>0.1130</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_intent</td>
+      <td>MEDICAL</td>
+      <td>6010</td>
+      <td>0.2672</td>
+      <td>0.2616</td>
+      <td>-0.0056</td>
+      <td>0.8748</td>
+      <td>0.7914</td>
+      <td>0.1135</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_intent</td>
+      <td>MEDICAL</td>
+      <td>6010</td>
+      <td>0.2672</td>
+      <td>0.2638</td>
+      <td>-0.0035</td>
+      <td>0.8759</td>
+      <td>0.7965</td>
+      <td>0.1123</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_intent</td>
+      <td>MEDICAL</td>
+      <td>6010</td>
+      <td>0.2672</td>
+      <td>0.4768</td>
+      <td>0.2096</td>
+      <td>0.7980</td>
+      <td>0.5824</td>
+      <td>0.2018</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_intent</td>
+      <td>PERSONAL</td>
+      <td>5460</td>
+      <td>0.2005</td>
+      <td>0.1947</td>
+      <td>-0.0058</td>
+      <td>0.8336</td>
+      <td>0.5935</td>
+      <td>0.1173</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_intent</td>
+      <td>PERSONAL</td>
+      <td>5460</td>
+      <td>0.2005</td>
+      <td>0.1968</td>
+      <td>-0.0037</td>
+      <td>0.8335</td>
+      <td>0.5923</td>
+      <td>0.1170</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_intent</td>
+      <td>PERSONAL</td>
+      <td>5460</td>
+      <td>0.2005</td>
+      <td>0.2059</td>
+      <td>0.0053</td>
+      <td>0.8316</td>
+      <td>0.5872</td>
+      <td>0.1186</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_intent</td>
+      <td>PERSONAL</td>
+      <td>5460</td>
+      <td>0.2005</td>
+      <td>0.4572</td>
+      <td>0.2566</td>
+      <td>0.7453</td>
+      <td>0.3840</td>
+      <td>0.2160</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>loan_intent</td>
+      <td>VENTURE</td>
+      <td>5664</td>
+      <td>0.1492</td>
+      <td>0.1438</td>
+      <td>-0.0054</td>
+      <td>0.8966</td>
+      <td>0.6491</td>
+      <td>0.0815</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>loan_intent</td>
+      <td>VENTURE</td>
+      <td>5664</td>
+      <td>0.1492</td>
+      <td>0.1469</td>
+      <td>-0.0023</td>
+      <td>0.8982</td>
+      <td>0.6498</td>
+      <td>0.0808</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>loan_intent</td>
+      <td>VENTURE</td>
+      <td>5664</td>
+      <td>0.1492</td>
+      <td>0.1483</td>
+      <td>-0.0009</td>
+      <td>0.8945</td>
+      <td>0.6384</td>
+      <td>0.0826</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>loan_intent</td>
+      <td>VENTURE</td>
+      <td>5664</td>
+      <td>0.1492</td>
+      <td>0.3320</td>
+      <td>0.1828</td>
+      <td>0.7930</td>
+      <td>0.3467</td>
+      <td>0.1483</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>person_home_ownership</td>
+      <td>MORTGAGE</td>
+      <td>13211</td>
+      <td>0.1258</td>
+      <td>0.1342</td>
+      <td>0.0084</td>
+      <td>0.7848</td>
+      <td>0.4363</td>
+      <td>0.0915</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>person_home_ownership</td>
+      <td>MORTGAGE</td>
+      <td>13211</td>
+      <td>0.1258</td>
+      <td>0.1328</td>
+      <td>0.0070</td>
+      <td>0.7861</td>
+      <td>0.4372</td>
+      <td>0.0911</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>MORTGAGE</td>
+      <td>13211</td>
+      <td>0.1258</td>
+      <td>0.1362</td>
+      <td>0.0104</td>
+      <td>0.7792</td>
+      <td>0.4268</td>
+      <td>0.0924</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>MORTGAGE</td>
+      <td>13211</td>
+      <td>0.1258</td>
+      <td>0.4657</td>
+      <td>0.3399</td>
+      <td>0.7332</td>
+      <td>0.3552</td>
+      <td>0.2402</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>person_home_ownership</td>
+      <td>OTHER</td>
+      <td>104</td>
+      <td>0.3173</td>
+      <td>0.2603</td>
+      <td>-0.0571</td>
+      <td>0.9193</td>
+      <td>0.8780</td>
+      <td>0.1102</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>person_home_ownership</td>
+      <td>OTHER</td>
+      <td>104</td>
+      <td>0.3173</td>
+      <td>0.2573</td>
+      <td>-0.0601</td>
+      <td>0.9219</td>
+      <td>0.8802</td>
+      <td>0.1098</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>OTHER</td>
+      <td>104</td>
+      <td>0.3173</td>
+      <td>0.2634</td>
+      <td>-0.0539</td>
+      <td>0.9227</td>
+      <td>0.8808</td>
+      <td>0.1083</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>OTHER</td>
+      <td>104</td>
+      <td>0.3173</td>
+      <td>0.4212</td>
+      <td>0.1039</td>
+      <td>0.9240</td>
+      <td>0.8857</td>
+      <td>0.1373</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>person_home_ownership</td>
+      <td>OWN</td>
+      <td>2557</td>
+      <td>0.0751</td>
+      <td>0.0756</td>
+      <td>0.0005</td>
+      <td>0.8361</td>
+      <td>0.2999</td>
+      <td>0.0647</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>person_home_ownership</td>
+      <td>OWN</td>
+      <td>2557</td>
+      <td>0.0751</td>
+      <td>0.0793</td>
+      <td>0.0042</td>
+      <td>0.8343</td>
+      <td>0.3008</td>
+      <td>0.0646</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>OWN</td>
+      <td>2557</td>
+      <td>0.0751</td>
+      <td>0.1006</td>
+      <td>0.0255</td>
+      <td>0.8321</td>
+      <td>0.2745</td>
+      <td>0.0698</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>OWN</td>
+      <td>2557</td>
+      <td>0.0751</td>
+      <td>0.3775</td>
+      <td>0.3024</td>
+      <td>0.8744</td>
+      <td>0.4089</td>
+      <td>0.1641</td>
+    </tr>
+    <tr>
+      <td>Adjusted grouped-LR model</td>
+      <td>person_home_ownership</td>
+      <td>RENT</td>
+      <td>16380</td>
+      <td>0.3163</td>
+      <td>0.3140</td>
+      <td>-0.0023</td>
+      <td>0.8710</td>
+      <td>0.7816</td>
+      <td>0.1323</td>
+    </tr>
+    <tr>
+      <td>Full model</td>
+      <td>person_home_ownership</td>
+      <td>RENT</td>
+      <td>16380</td>
+      <td>0.3163</td>
+      <td>0.3140</td>
+      <td>-0.0023</td>
+      <td>0.8719</td>
+      <td>0.7825</td>
+      <td>0.1320</td>
+    </tr>
+    <tr>
+      <td>Representative-sample adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>RENT</td>
+      <td>16380</td>
+      <td>0.3163</td>
+      <td>0.3094</td>
+      <td>-0.0069</td>
+      <td>0.8732</td>
+      <td>0.7837</td>
+      <td>0.1321</td>
+    </tr>
+    <tr>
+      <td>Weighted adjusted model</td>
+      <td>person_home_ownership</td>
+      <td>RENT</td>
+      <td>16380</td>
+      <td>0.3163</td>
+      <td>0.4146</td>
+      <td>0.0983</td>
+      <td>0.8366</td>
+      <td>0.7396</td>
+      <td>0.1657</td>
     </tr>
   </tbody>
 </table></section>
@@ -84,7 +1821,7 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
 <article class='metric-card'><span>AIC</span><strong>23,443.4184</strong><small>Fit with complexity penalty</small></article>
 <article class='metric-card'><span>McFadden R2</span><strong>0.3103</strong><small>Pseudo-R2</small></article>
 </div>
-<div class='comment-box'><p><strong>Model read:</strong> ROC AUC is 0.8586, KS is 0.5807, and Brier score is 0.1098.</p><p><strong>Statistical tests:</strong> 5 indicators are not significant at alpha 0.05 and are candidates for an adjusted model. Grouped calibration is statistically imperfect; score calibration should be monitored before deployment.</p></div>
+<div class='comment-box'><p><strong>Model read:</strong> ROC AUC is 0.8586, KS is 0.5807, and Brier score is 0.1098.</p><p><strong>Statistical tests:</strong> 1 dummy-variable groups fail the LR screen and are candidates for grouped removal. 2 ungrouped indicators fail the Wald screen. Grouped calibration is statistically imperfect; score calibration should be monitored before deployment.</p></div>
 <h3>Metrics</h3>
 <table class="dataframe metrics-table">
   <thead>
@@ -94,6 +1831,22 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td>roc_auc</td>
+      <td>0.8586</td>
+    </tr>
+    <tr>
+      <td>average_precision</td>
+      <td>0.6963</td>
+    </tr>
+    <tr>
+      <td>brier_score</td>
+      <td>0.1098</td>
+    </tr>
+    <tr>
+      <td>ks_statistic</td>
+      <td>0.5807</td>
+    </tr>
     <tr>
       <td>accuracy</td>
       <td>0.8516</td>
@@ -113,22 +1866,6 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
     <tr>
       <td>specificity</td>
       <td>0.9568</td>
-    </tr>
-    <tr>
-      <td>roc_auc</td>
-      <td>0.8586</td>
-    </tr>
-    <tr>
-      <td>average_precision</td>
-      <td>0.6963</td>
-    </tr>
-    <tr>
-      <td>brier_score</td>
-      <td>0.1098</td>
-    </tr>
-    <tr>
-      <td>ks_statistic</td>
-      <td>0.5807</td>
     </tr>
     <tr>
       <td>threshold</td>
@@ -194,6 +1931,58 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
       <td>588.4268</td>
       <td>0.0000</td>
       <td>Tests grouped calibration; small p-values suggest calibration mismatch.</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Grouped Dummy LR Tests</h3>
+<table class="dataframe group-tests-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>group</th>
+      <th>features</th>
+      <th>df</th>
+      <th>lr_statistic</th>
+      <th>p_value</th>
+      <th>significant</th>
+      <th>action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>cb_person_default_on_file</td>
+      <td>cb_person_default_on_file_Y</td>
+      <td>1</td>
+      <td>0.0000</td>
+      <td>1.0000</td>
+      <td>False</td>
+      <td>candidate_remove</td>
+    </tr>
+    <tr>
+      <td>loan_intent</td>
+      <td>loan_intent_EDUCATION, loan_intent_HOMEIMPROVEMENT, loan_intent_MEDICAL, loan_intent_PERSONAL, loan_intent_VENTURE</td>
+      <td>5</td>
+      <td>797.0335</td>
+      <td>0.0000</td>
+      <td>True</td>
+      <td>keep</td>
+    </tr>
+    <tr>
+      <td>person_home_ownership</td>
+      <td>person_home_ownership_OTHER, person_home_ownership_OWN, person_home_ownership_RENT</td>
+      <td>3</td>
+      <td>1,264.5823</td>
+      <td>0.0000</td>
+      <td>True</td>
+      <td>keep</td>
+    </tr>
+    <tr>
+      <td>loan_grade</td>
+      <td>loan_grade_B, loan_grade_C, loan_grade_D, loan_grade_E, loan_grade_F, loan_grade_G</td>
+      <td>6</td>
+      <td>1,480.7038</td>
+      <td>0.0000</td>
+      <td>True</td>
+      <td>keep</td>
     </tr>
   </tbody>
 </table>
@@ -654,16 +2443,16 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
 <figure><img src='model_1_statistical_tests.png' alt='Statistical Tests'><figcaption><strong>Statistical Tests.</strong> Longer bars mean smaller p-values and stronger evidence against the null.</figcaption></figure>
 </div>
 </section>
-<section class='model-section'><h2>Adjusted significant-indicator model</h2>
+<section class='model-section'><h2>Adjusted grouped-LR model</h2>
 <div class='metric-grid'>
-<article class='metric-card'><span>ROC AUC</span><strong>0.8571</strong><small>Ranking quality</small></article>
-<article class='metric-card'><span>Avg. precision</span><strong>0.6967</strong><small>Precision-recall area</small></article>
+<article class='metric-card'><span>ROC AUC</span><strong>0.8577</strong><small>Ranking quality</small></article>
+<article class='metric-card'><span>Avg. precision</span><strong>0.6947</strong><small>Precision-recall area</small></article>
 <article class='metric-card'><span>Brier score</span><strong>0.1101</strong><small>Calibration loss</small></article>
-<article class='metric-card'><span>KS</span><strong>0.5768</strong><small>Score separation</small></article>
-<article class='metric-card'><span>AIC</span><strong>23,536.1574</strong><small>Fit with complexity penalty</small></article>
-<article class='metric-card'><span>McFadden R2</span><strong>0.3073</strong><small>Pseudo-R2</small></article>
+<article class='metric-card'><span>KS</span><strong>0.5815</strong><small>Score separation</small></article>
+<article class='metric-card'><span>AIC</span><strong>23,531.4260</strong><small>Fit with complexity penalty</small></article>
+<article class='metric-card'><span>McFadden R2</span><strong>0.3075</strong><small>Pseudo-R2</small></article>
 </div>
-<div class='comment-box'><p><strong>Model read:</strong> ROC AUC is 0.8571, KS is 0.5768, and Brier score is 0.1101.</p><p><strong>Statistical tests:</strong> All fitted indicators pass the alpha 0.05 Wald screen. Grouped calibration is statistically imperfect; score calibration should be monitored before deployment.</p></div>
+<div class='comment-box'><p><strong>Model read:</strong> ROC AUC is 0.8577, KS is 0.5815, and Brier score is 0.1101.</p><p><strong>Statistical tests:</strong> Grouped LR and ungrouped Wald screens do not flag removable indicators. Grouped calibration is statistically imperfect; score calibration should be monitored before deployment.</p></div>
 <h3>Metrics</h3>
 <table class="dataframe metrics-table">
   <thead>
@@ -674,32 +2463,12 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
   </thead>
   <tbody>
     <tr>
-      <td>accuracy</td>
-      <td>0.8517</td>
-    </tr>
-    <tr>
-      <td>precision</td>
-      <td>0.7572</td>
-    </tr>
-    <tr>
-      <td>recall</td>
-      <td>0.4757</td>
-    </tr>
-    <tr>
-      <td>f1_score</td>
-      <td>0.5843</td>
-    </tr>
-    <tr>
-      <td>specificity</td>
-      <td>0.9572</td>
-    </tr>
-    <tr>
       <td>roc_auc</td>
-      <td>0.8571</td>
+      <td>0.8577</td>
     </tr>
     <tr>
       <td>average_precision</td>
-      <td>0.6967</td>
+      <td>0.6947</td>
     </tr>
     <tr>
       <td>brier_score</td>
@@ -707,7 +2476,27 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
     </tr>
     <tr>
       <td>ks_statistic</td>
-      <td>0.5768</td>
+      <td>0.5815</td>
+    </tr>
+    <tr>
+      <td>accuracy</td>
+      <td>0.8498</td>
+    </tr>
+    <tr>
+      <td>precision</td>
+      <td>0.7484</td>
+    </tr>
+    <tr>
+      <td>recall</td>
+      <td>0.4740</td>
+    </tr>
+    <tr>
+      <td>f1_score</td>
+      <td>0.5804</td>
+    </tr>
+    <tr>
+      <td>specificity</td>
+      <td>0.9553</td>
     </tr>
     <tr>
       <td>threshold</td>
@@ -715,11 +2504,11 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
     </tr>
     <tr>
       <td>optimal_ks_threshold</td>
-      <td>0.2633</td>
+      <td>0.2689</td>
     </tr>
     <tr>
       <td>log_likelihood</td>
-      <td>-11,748.0787</td>
+      <td>-11,743.7130</td>
     </tr>
     <tr>
       <td>null_log_likelihood</td>
@@ -727,15 +2516,15 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
     </tr>
     <tr>
       <td>aic</td>
-      <td>23,536.1574</td>
+      <td>23,531.4260</td>
     </tr>
     <tr>
       <td>bic</td>
-      <td>23,703.7841</td>
+      <td>23,715.8154</td>
     </tr>
     <tr>
       <td>mcfadden_r2</td>
-      <td>0.3073</td>
+      <td>0.3075</td>
     </tr>
   </tbody>
 </table>
@@ -752,27 +2541,70 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
   <tbody>
     <tr>
       <td>Likelihood-ratio vs intercept-only</td>
-      <td>10,421.9178</td>
+      <td>10,430.6492</td>
       <td>0.0000</td>
       <td>Tests whether the fitted indicators improve log-likelihood over a null model.</td>
     </tr>
     <tr>
       <td>Kolmogorov-Smirnov score separation</td>
-      <td>0.5768</td>
+      <td>0.5815</td>
       <td>0.0000</td>
       <td>Tests whether default and non-default score distributions differ.</td>
     </tr>
     <tr>
       <td>Mann-Whitney score ranking</td>
-      <td>152,568,970.0000</td>
+      <td>152,664,625.0000</td>
       <td>0.0000</td>
       <td>Tests whether defaults tend to receive higher scores than non-defaults.</td>
     </tr>
     <tr>
       <td>Hosmer-Lemeshow calibration</td>
-      <td>646.4445</td>
+      <td>626.8760</td>
       <td>0.0000</td>
       <td>Tests grouped calibration; small p-values suggest calibration mismatch.</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Grouped Dummy LR Tests</h3>
+<table class="dataframe group-tests-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>group</th>
+      <th>features</th>
+      <th>df</th>
+      <th>lr_statistic</th>
+      <th>p_value</th>
+      <th>significant</th>
+      <th>action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>loan_intent</td>
+      <td>loan_intent_EDUCATION, loan_intent_HOMEIMPROVEMENT, loan_intent_MEDICAL, loan_intent_PERSONAL, loan_intent_VENTURE</td>
+      <td>5</td>
+      <td>519.8069</td>
+      <td>0.0000</td>
+      <td>True</td>
+      <td>keep</td>
+    </tr>
+    <tr>
+      <td>person_home_ownership</td>
+      <td>person_home_ownership_OTHER, person_home_ownership_OWN, person_home_ownership_RENT</td>
+      <td>3</td>
+      <td>1,074.2949</td>
+      <td>0.0000</td>
+      <td>True</td>
+      <td>keep</td>
+    </tr>
+    <tr>
+      <td>loan_grade</td>
+      <td>loan_grade_B, loan_grade_C, loan_grade_D, loan_grade_E, loan_grade_F, loan_grade_G</td>
+      <td>6</td>
+      <td>1,355.7258</td>
+      <td>0.0000</td>
+      <td>True</td>
+      <td>keep</td>
     </tr>
   </tbody>
 </table>
@@ -792,10 +2624,40 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
   </thead>
   <tbody>
     <tr>
+      <td>loan_grade_F</td>
+      <td>0.3027</td>
+      <td>0.2570</td>
+      <td>1.1778</td>
+      <td>0.2389</td>
+      <td>-0.2010</td>
+      <td>0.8065</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <td>loan_grade_G</td>
+      <td>0.2036</td>
+      <td>0.3838</td>
+      <td>0.5305</td>
+      <td>0.5958</td>
+      <td>-0.5487</td>
+      <td>0.9560</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <td>person_home_ownership_OTHER</td>
+      <td>0.0618</td>
+      <td>0.2857</td>
+      <td>0.2164</td>
+      <td>0.8287</td>
+      <td>-0.4982</td>
+      <td>0.6218</td>
+      <td>False</td>
+    </tr>
+    <tr>
       <td>person_income</td>
       <td>-0.0000</td>
       <td>0.0000</td>
-      <td>-47.8943</td>
+      <td>-48.2816</td>
       <td>0.0000</td>
       <td>-0.0000</td>
       <td>-0.0000</td>
@@ -805,190 +2667,180 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
       <td>loan_amnt</td>
       <td>0.0001</td>
       <td>0.0000</td>
-      <td>39.3469</td>
+      <td>39.1050</td>
       <td>0.0000</td>
       <td>0.0001</td>
       <td>0.0001</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>person_home_ownership_RENT</td>
-      <td>0.7647</td>
-      <td>0.0383</td>
-      <td>19.9495</td>
-      <td>0.0000</td>
-      <td>0.6895</td>
-      <td>0.8398</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>loan_int_rate</td>
-      <td>0.2093</td>
-      <td>0.0106</td>
-      <td>19.8392</td>
-      <td>0.0000</td>
-      <td>0.1886</td>
-      <td>0.2300</td>
       <td>True</td>
     </tr>
     <tr>
       <td>loan_intent_VENTURE</td>
-      <td>-1.0982</td>
-      <td>0.0585</td>
-      <td>-18.7785</td>
+      <td>-1.1274</td>
+      <td>0.0591</td>
+      <td>-19.0909</td>
       <td>0.0000</td>
-      <td>-1.2128</td>
-      <td>-0.9836</td>
+      <td>-1.2431</td>
+      <td>-1.0116</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>person_home_ownership_RENT</td>
+      <td>0.7108</td>
+      <td>0.0387</td>
+      <td>18.3686</td>
+      <td>0.0000</td>
+      <td>0.6350</td>
+      <td>0.7867</td>
       <td>True</td>
     </tr>
     <tr>
       <td>loan_intent_EDUCATION</td>
-      <td>-0.8728</td>
-      <td>0.0538</td>
-      <td>-16.2246</td>
+      <td>-0.8921</td>
+      <td>0.0542</td>
+      <td>-16.4516</td>
       <td>0.0000</td>
-      <td>-0.9782</td>
-      <td>-0.7674</td>
+      <td>-0.9984</td>
+      <td>-0.7858</td>
       <td>True</td>
     </tr>
     <tr>
       <td>person_home_ownership_OWN</td>
-      <td>-1.4699</td>
-      <td>0.0938</td>
-      <td>-15.6764</td>
+      <td>-1.4683</td>
+      <td>0.0930</td>
+      <td>-15.7922</td>
       <td>0.0000</td>
-      <td>-1.6536</td>
+      <td>-1.6505</td>
       <td>-1.2861</td>
       <td>True</td>
     </tr>
     <tr>
       <td>loan_intent_PERSONAL</td>
-      <td>-0.6930</td>
-      <td>0.0554</td>
-      <td>-12.5039</td>
+      <td>-0.7053</td>
+      <td>0.0558</td>
+      <td>-12.6297</td>
       <td>0.0000</td>
-      <td>-0.8016</td>
-      <td>-0.5843</td>
+      <td>-0.8148</td>
+      <td>-0.5959</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>loan_int_rate</td>
+      <td>0.2175</td>
+      <td>0.0174</td>
+      <td>12.5345</td>
+      <td>0.0000</td>
+      <td>0.1835</td>
+      <td>0.2515</td>
       <td>True</td>
     </tr>
     <tr>
       <td>loan_grade_B</td>
-      <td>-0.5532</td>
-      <td>0.0539</td>
-      <td>-10.2619</td>
+      <td>-0.5767</td>
+      <td>0.0759</td>
+      <td>-7.6003</td>
       <td>0.0000</td>
-      <td>-0.6589</td>
-      <td>-0.4476</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>loan_grade_C</td>
-      <td>-0.7595</td>
-      <td>0.0755</td>
-      <td>-10.0555</td>
-      <td>0.0000</td>
-      <td>-0.9075</td>
-      <td>-0.6114</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>intercept</td>
-      <td>-1.2680</td>
-      <td>0.1551</td>
-      <td>-8.1772</td>
-      <td>0.0000</td>
-      <td>-1.5719</td>
-      <td>-0.9641</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>person_age</td>
-      <td>-0.0449</td>
-      <td>0.0057</td>
-      <td>-7.8144</td>
-      <td>0.0000</td>
-      <td>-0.0561</td>
-      <td>-0.0336</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>loan_grade_D</td>
-      <td>0.7080</td>
-      <td>0.0924</td>
-      <td>7.6643</td>
-      <td>0.0000</td>
-      <td>0.5270</td>
-      <td>0.8891</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>loan_grade_E</td>
-      <td>0.9030</td>
-      <td>0.1278</td>
-      <td>7.0667</td>
-      <td>0.0000</td>
-      <td>0.6525</td>
-      <td>1.1534</td>
+      <td>-0.7254</td>
+      <td>-0.4279</td>
       <td>True</td>
     </tr>
     <tr>
       <td>loan_intent_MEDICAL</td>
-      <td>-0.3356</td>
-      <td>0.0512</td>
-      <td>-6.5542</td>
+      <td>-0.3828</td>
+      <td>0.0517</td>
+      <td>-7.4025</td>
       <td>0.0000</td>
-      <td>-0.4359</td>
-      <td>-0.2352</td>
+      <td>-0.4842</td>
+      <td>-0.2815</td>
       <td>True</td>
     </tr>
     <tr>
-      <td>cb_person_cred_hist_length</td>
-      <td>0.0513</td>
-      <td>0.0086</td>
-      <td>5.9830</td>
+      <td>loan_grade_C</td>
+      <td>-0.8281</td>
+      <td>0.1146</td>
+      <td>-7.2272</td>
       <td>0.0000</td>
-      <td>0.0345</td>
-      <td>0.0681</td>
+      <td>-1.0527</td>
+      <td>-0.6035</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>person_age</td>
+      <td>-0.0416</td>
+      <td>0.0058</td>
+      <td>-7.1645</td>
+      <td>0.0000</td>
+      <td>-0.0530</td>
+      <td>-0.0302</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>intercept</td>
+      <td>-1.2758</td>
+      <td>0.1865</td>
+      <td>-6.8404</td>
+      <td>0.0000</td>
+      <td>-1.6414</td>
+      <td>-0.9103</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>loan_grade_D</td>
+      <td>0.8343</td>
+      <td>0.1449</td>
+      <td>5.7596</td>
+      <td>0.0000</td>
+      <td>0.5504</td>
+      <td>1.1182</td>
       <td>True</td>
     </tr>
     <tr>
       <td>loan_intent_HOMEIMPROVEMENT</td>
-      <td>0.2533</td>
+      <td>0.3455</td>
       <td>0.0602</td>
-      <td>4.2096</td>
+      <td>5.7357</td>
       <td>0.0000</td>
-      <td>0.1354</td>
-      <td>0.3713</td>
+      <td>0.2275</td>
+      <td>0.4636</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>loan_grade_E</td>
+      <td>0.9192</td>
+      <td>0.1852</td>
+      <td>4.9627</td>
+      <td>0.0000</td>
+      <td>0.5562</td>
+      <td>1.2822</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>cb_person_cred_hist_length</td>
+      <td>0.0395</td>
+      <td>0.0087</td>
+      <td>4.5492</td>
+      <td>0.0000</td>
+      <td>0.0225</td>
+      <td>0.0565</td>
       <td>True</td>
     </tr>
     <tr>
       <td>emp_length_missing</td>
-      <td>0.3776</td>
-      <td>0.0939</td>
-      <td>4.0217</td>
+      <td>0.3667</td>
+      <td>0.0943</td>
+      <td>3.8896</td>
       <td>0.0001</td>
-      <td>0.1936</td>
-      <td>0.5617</td>
+      <td>0.1819</td>
+      <td>0.5515</td>
       <td>True</td>
     </tr>
     <tr>
       <td>emp_length</td>
-      <td>-0.0154</td>
-      <td>0.0046</td>
-      <td>-3.3478</td>
-      <td>0.0008</td>
-      <td>-0.0245</td>
-      <td>-0.0064</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <td>cb_person_default_on_file_Y</td>
-      <td>0.1013</td>
-      <td>0.0488</td>
-      <td>2.0771</td>
-      <td>0.0378</td>
-      <td>0.0057</td>
-      <td>0.1969</td>
+      <td>-0.0165</td>
+      <td>0.0047</td>
+      <td>-3.5527</td>
+      <td>0.0004</td>
+      <td>-0.0257</td>
+      <td>-0.0074</td>
       <td>True</td>
     </tr>
   </tbody>
@@ -1006,62 +2858,62 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
   <tbody>
     <tr>
       <td>0</td>
-      <td>0.0049</td>
-      <td>0.0288</td>
+      <td>0.0046</td>
+      <td>0.0270</td>
       <td>3226</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>0.0199</td>
-      <td>0.0307</td>
+      <td>0.0192</td>
+      <td>0.0316</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>0.0409</td>
-      <td>0.0549</td>
+      <td>0.0397</td>
+      <td>0.0574</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>3</td>
-      <td>0.0696</td>
-      <td>0.0701</td>
+      <td>0.0680</td>
+      <td>0.0673</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>4</td>
-      <td>0.1081</td>
-      <td>0.0958</td>
+      <td>0.1056</td>
+      <td>0.0921</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>5</td>
-      <td>0.1603</td>
-      <td>0.1085</td>
+      <td>0.1573</td>
+      <td>0.1098</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>6</td>
-      <td>0.2305</td>
-      <td>0.1625</td>
+      <td>0.2265</td>
+      <td>0.1544</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>7</td>
-      <td>0.3263</td>
-      <td>0.2967</td>
+      <td>0.3222</td>
+      <td>0.3048</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>8</td>
-      <td>0.4794</td>
-      <td>0.5352</td>
+      <td>0.4811</td>
+      <td>0.5454</td>
       <td>3225</td>
     </tr>
     <tr>
       <td>9</td>
-      <td>0.7743</td>
-      <td>0.8081</td>
+      <td>0.7882</td>
+      <td>0.8016</td>
       <td>3226</td>
     </tr>
   </tbody>
@@ -1083,90 +2935,90 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
     <tr>
       <td>0</td>
       <td>3226</td>
-      <td>2607</td>
-      <td>0.7743</td>
-      <td>0.8081</td>
-      <td>2607</td>
-      <td>0.3688</td>
+      <td>2586</td>
+      <td>0.7882</td>
+      <td>0.8016</td>
+      <td>2586</td>
+      <td>0.3659</td>
     </tr>
     <tr>
       <td>1</td>
       <td>3225</td>
-      <td>1726</td>
-      <td>0.4794</td>
-      <td>0.5352</td>
-      <td>4333</td>
-      <td>0.6130</td>
+      <td>1759</td>
+      <td>0.4811</td>
+      <td>0.5454</td>
+      <td>4345</td>
+      <td>0.6147</td>
     </tr>
     <tr>
       <td>2</td>
       <td>3225</td>
-      <td>957</td>
-      <td>0.3263</td>
-      <td>0.2967</td>
-      <td>5290</td>
-      <td>0.7484</td>
+      <td>983</td>
+      <td>0.3222</td>
+      <td>0.3048</td>
+      <td>5328</td>
+      <td>0.7538</td>
     </tr>
     <tr>
       <td>3</td>
       <td>3225</td>
-      <td>524</td>
-      <td>0.2305</td>
-      <td>0.1625</td>
-      <td>5814</td>
-      <td>0.8226</td>
+      <td>498</td>
+      <td>0.2265</td>
+      <td>0.1544</td>
+      <td>5826</td>
+      <td>0.8243</td>
     </tr>
     <tr>
       <td>4</td>
       <td>3225</td>
-      <td>350</td>
-      <td>0.1603</td>
-      <td>0.1085</td>
-      <td>6164</td>
-      <td>0.8721</td>
+      <td>354</td>
+      <td>0.1573</td>
+      <td>0.1098</td>
+      <td>6180</td>
+      <td>0.8744</td>
     </tr>
     <tr>
       <td>5</td>
       <td>3225</td>
-      <td>309</td>
-      <td>0.1081</td>
-      <td>0.0958</td>
-      <td>6473</td>
-      <td>0.9158</td>
+      <td>297</td>
+      <td>0.1056</td>
+      <td>0.0921</td>
+      <td>6477</td>
+      <td>0.9164</td>
     </tr>
     <tr>
       <td>6</td>
       <td>3225</td>
-      <td>226</td>
-      <td>0.0696</td>
-      <td>0.0701</td>
-      <td>6699</td>
-      <td>0.9478</td>
+      <td>217</td>
+      <td>0.0680</td>
+      <td>0.0673</td>
+      <td>6694</td>
+      <td>0.9471</td>
     </tr>
     <tr>
       <td>7</td>
       <td>3225</td>
-      <td>177</td>
-      <td>0.0409</td>
-      <td>0.0549</td>
-      <td>6876</td>
-      <td>0.9728</td>
+      <td>185</td>
+      <td>0.0397</td>
+      <td>0.0574</td>
+      <td>6879</td>
+      <td>0.9733</td>
     </tr>
     <tr>
       <td>8</td>
       <td>3225</td>
-      <td>99</td>
-      <td>0.0199</td>
-      <td>0.0307</td>
-      <td>6975</td>
-      <td>0.9868</td>
+      <td>102</td>
+      <td>0.0192</td>
+      <td>0.0316</td>
+      <td>6981</td>
+      <td>0.9877</td>
     </tr>
     <tr>
       <td>9</td>
       <td>3226</td>
-      <td>93</td>
-      <td>0.0049</td>
-      <td>0.0288</td>
+      <td>87</td>
+      <td>0.0046</td>
+      <td>0.0270</td>
       <td>7068</td>
       <td>1.0000</td>
     </tr>
@@ -1181,6 +3033,636 @@ figcaption { border-top: 1px solid var(--line); padding: 10px 12px; color: var(-
 <figure><img src='model_2_lift_curve.png' alt='Lift'><figcaption><strong>Lift.</strong> The first deciles should capture a disproportionate share of defaults.</figcaption></figure>
 <figure><img src='model_2_coefficient_significance.png' alt='Indicator Significance'><figcaption><strong>Indicator Significance.</strong> Bars inside the dashed +/-1.96 region are weak at the 5% level.</figcaption></figure>
 <figure><img src='model_2_statistical_tests.png' alt='Statistical Tests'><figcaption><strong>Statistical Tests.</strong> Longer bars mean smaller p-values and stronger evidence against the null.</figcaption></figure>
+</div>
+</section>
+<section class='model-section'><h2>Representative-sample adjusted model</h2>
+<div class='metric-grid'>
+<article class='metric-card'><span>ROC AUC</span><strong>0.8567</strong><small>Ranking quality</small></article>
+<article class='metric-card'><span>Avg. precision</span><strong>0.6902</strong><small>Precision-recall area</small></article>
+<article class='metric-card'><span>Brier score</span><strong>0.1108</strong><small>Calibration loss</small></article>
+<article class='metric-card'><span>KS</span><strong>0.5796</strong><small>Score separation</small></article>
+<article class='metric-card'><span>AIC</span><strong>23,692.4433</strong><small>Fit with complexity penalty</small></article>
+<article class='metric-card'><span>McFadden R2</span><strong>0.3028</strong><small>Pseudo-R2</small></article>
+</div>
+<div class='comment-box'><p><strong>Model read:</strong> ROC AUC is 0.8567, KS is 0.5796, and Brier score is 0.1108.</p><p><strong>Statistical tests:</strong> Grouped LR and ungrouped Wald screens do not flag removable indicators. Grouped calibration is statistically imperfect; score calibration should be monitored before deployment.</p></div>
+<h3>Metrics</h3>
+<table class="dataframe metrics-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>metric</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>roc_auc</td>
+      <td>0.8567</td>
+    </tr>
+    <tr>
+      <td>average_precision</td>
+      <td>0.6902</td>
+    </tr>
+    <tr>
+      <td>brier_score</td>
+      <td>0.1108</td>
+    </tr>
+    <tr>
+      <td>ks_statistic</td>
+      <td>0.5796</td>
+    </tr>
+    <tr>
+      <td>accuracy</td>
+      <td>0.8490</td>
+    </tr>
+    <tr>
+      <td>precision</td>
+      <td>0.7500</td>
+    </tr>
+    <tr>
+      <td>recall</td>
+      <td>0.4665</td>
+    </tr>
+    <tr>
+      <td>f1_score</td>
+      <td>0.5752</td>
+    </tr>
+    <tr>
+      <td>specificity</td>
+      <td>0.9564</td>
+    </tr>
+    <tr>
+      <td>threshold</td>
+      <td>0.5000</td>
+    </tr>
+    <tr>
+      <td>optimal_ks_threshold</td>
+      <td>0.2810</td>
+    </tr>
+    <tr>
+      <td>log_likelihood</td>
+      <td>-11,824.2217</td>
+    </tr>
+    <tr>
+      <td>null_log_likelihood</td>
+      <td>-16,959.0376</td>
+    </tr>
+    <tr>
+      <td>aic</td>
+      <td>23,692.4433</td>
+    </tr>
+    <tr>
+      <td>bic</td>
+      <td>23,876.8327</td>
+    </tr>
+    <tr>
+      <td>mcfadden_r2</td>
+      <td>0.3028</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Statistical Tests</h3>
+<table class="dataframe tests-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>test</th>
+      <th>statistic</th>
+      <th>p_value</th>
+      <th>comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Likelihood-ratio vs intercept-only</td>
+      <td>10,269.6319</td>
+      <td>0.0000</td>
+      <td>Tests whether the fitted indicators improve log-likelihood over a null model.</td>
+    </tr>
+    <tr>
+      <td>Kolmogorov-Smirnov score separation</td>
+      <td>0.5796</td>
+      <td>0.0000</td>
+      <td>Tests whether default and non-default score distributions differ.</td>
+    </tr>
+    <tr>
+      <td>Mann-Whitney score ranking</td>
+      <td>152,488,427.0000</td>
+      <td>0.0000</td>
+      <td>Tests whether defaults tend to receive higher scores than non-defaults.</td>
+    </tr>
+    <tr>
+      <td>Hosmer-Lemeshow calibration</td>
+      <td>790.3493</td>
+      <td>0.0000</td>
+      <td>Tests grouped calibration; small p-values suggest calibration mismatch.</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Grouped Dummy LR Tests</h3>
+<p class='note'>No rows to display.</p>
+<h3>Indicator Significance</h3>
+<p class='note'>No rows to display.</p>
+<h3>Calibration Deciles</h3>
+<table class="dataframe calibration-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>decile</th>
+      <th>mean_pred</th>
+      <th>actual_rate</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.0049</td>
+      <td>0.0316</td>
+      <td>3226</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>0.0210</td>
+      <td>0.0344</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.0431</td>
+      <td>0.0505</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.0715</td>
+      <td>0.0688</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.1083</td>
+      <td>0.0927</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0.1584</td>
+      <td>0.1020</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>0.2258</td>
+      <td>0.1647</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>0.3182</td>
+      <td>0.2893</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>0.4765</td>
+      <td>0.5746</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>0.7900</td>
+      <td>0.7827</td>
+      <td>3226</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Lift Summary</h3>
+<table class="dataframe lift-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>decile</th>
+      <th>count</th>
+      <th>defaults</th>
+      <th>mean_score</th>
+      <th>default_rate</th>
+      <th>cumulative_defaults</th>
+      <th>cumulative_capture_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>3226</td>
+      <td>2525</td>
+      <td>0.7900</td>
+      <td>0.7827</td>
+      <td>2525</td>
+      <td>0.3572</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>3225</td>
+      <td>1853</td>
+      <td>0.4765</td>
+      <td>0.5746</td>
+      <td>4378</td>
+      <td>0.6194</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3225</td>
+      <td>933</td>
+      <td>0.3182</td>
+      <td>0.2893</td>
+      <td>5311</td>
+      <td>0.7514</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3225</td>
+      <td>531</td>
+      <td>0.2258</td>
+      <td>0.1647</td>
+      <td>5842</td>
+      <td>0.8265</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3225</td>
+      <td>329</td>
+      <td>0.1584</td>
+      <td>0.1020</td>
+      <td>6171</td>
+      <td>0.8731</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>3225</td>
+      <td>299</td>
+      <td>0.1083</td>
+      <td>0.0927</td>
+      <td>6470</td>
+      <td>0.9154</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>3225</td>
+      <td>222</td>
+      <td>0.0715</td>
+      <td>0.0688</td>
+      <td>6692</td>
+      <td>0.9468</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>3225</td>
+      <td>163</td>
+      <td>0.0431</td>
+      <td>0.0505</td>
+      <td>6855</td>
+      <td>0.9699</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>3225</td>
+      <td>111</td>
+      <td>0.0210</td>
+      <td>0.0344</td>
+      <td>6966</td>
+      <td>0.9856</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>3226</td>
+      <td>102</td>
+      <td>0.0049</td>
+      <td>0.0316</td>
+      <td>7068</td>
+      <td>1.0000</td>
+    </tr>
+  </tbody>
+</table>
+<div class='figure-grid'>
+<figure><img src='model_3_roc_curve.png' alt='ROC Curve'><figcaption><strong>ROC Curve.</strong> Higher curves indicate stronger ranking of defaults above non-defaults.</figcaption></figure>
+<figure><img src='model_3_pr_curve.png' alt='Precision-Recall Curve'><figcaption><strong>Precision-Recall Curve.</strong> Useful when defaults are a minority class because it focuses on positive-class retrieval.</figcaption></figure>
+<figure><img src='model_3_calibration_curve.png' alt='Calibration'><figcaption><strong>Calibration.</strong> Observed rates should track the dashed perfect-calibration line.</figcaption></figure>
+<figure><img src='model_3_score_distribution.png' alt='Score Distribution'><figcaption><strong>Score Distribution.</strong> Good risk scores separate the default and non-default distributions.</figcaption></figure>
+<figure><img src='model_3_confusion_matrix.png' alt='Confusion Matrix'><figcaption><strong>Confusion Matrix.</strong> Counts are computed at the selected operating threshold.</figcaption></figure>
+<figure><img src='model_3_lift_curve.png' alt='Lift'><figcaption><strong>Lift.</strong> The first deciles should capture a disproportionate share of defaults.</figcaption></figure>
+<figure><img src='model_3_statistical_tests.png' alt='Statistical Tests'><figcaption><strong>Statistical Tests.</strong> Longer bars mean smaller p-values and stronger evidence against the null.</figcaption></figure>
+</div>
+</section>
+<section class='model-section'><h2>Weighted adjusted model</h2>
+<div class='metric-grid'>
+<article class='metric-card'><span>ROC AUC</span><strong>0.7666</strong><small>Ranking quality</small></article>
+<article class='metric-card'><span>Avg. precision</span><strong>0.4583</strong><small>Precision-recall area</small></article>
+<article class='metric-card'><span>Brier score</span><strong>0.1960</strong><small>Calibration loss</small></article>
+<article class='metric-card'><span>KS</span><strong>0.4240</strong><small>Score separation</small></article>
+<article class='metric-card'><span>AIC</span><strong>37,099.1958</strong><small>Fit with complexity penalty</small></article>
+<article class='metric-card'><span>McFadden R2</span><strong>-0.0925</strong><small>Pseudo-R2</small></article>
+</div>
+<div class='comment-box'><p><strong>Model read:</strong> ROC AUC is 0.7666, KS is 0.4240, and Brier score is 0.1960.</p><p><strong>Statistical tests:</strong> Grouped LR and ungrouped Wald screens do not flag removable indicators. Grouped calibration is statistically imperfect; score calibration should be monitored before deployment.</p></div>
+<h3>Metrics</h3>
+<table class="dataframe metrics-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>metric</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>roc_auc</td>
+      <td>0.7666</td>
+    </tr>
+    <tr>
+      <td>average_precision</td>
+      <td>0.4583</td>
+    </tr>
+    <tr>
+      <td>brier_score</td>
+      <td>0.1960</td>
+    </tr>
+    <tr>
+      <td>ks_statistic</td>
+      <td>0.4240</td>
+    </tr>
+    <tr>
+      <td>accuracy</td>
+      <td>0.7009</td>
+    </tr>
+    <tr>
+      <td>precision</td>
+      <td>0.4000</td>
+    </tr>
+    <tr>
+      <td>recall</td>
+      <td>0.7292</td>
+    </tr>
+    <tr>
+      <td>f1_score</td>
+      <td>0.5166</td>
+    </tr>
+    <tr>
+      <td>specificity</td>
+      <td>0.6930</td>
+    </tr>
+    <tr>
+      <td>threshold</td>
+      <td>0.5000</td>
+    </tr>
+    <tr>
+      <td>optimal_ks_threshold</td>
+      <td>0.5047</td>
+    </tr>
+    <tr>
+      <td>log_likelihood</td>
+      <td>-18,527.5979</td>
+    </tr>
+    <tr>
+      <td>null_log_likelihood</td>
+      <td>-16,959.0376</td>
+    </tr>
+    <tr>
+      <td>aic</td>
+      <td>37,099.1958</td>
+    </tr>
+    <tr>
+      <td>bic</td>
+      <td>37,283.5851</td>
+    </tr>
+    <tr>
+      <td>mcfadden_r2</td>
+      <td>-0.0925</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Statistical Tests</h3>
+<table class="dataframe tests-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>test</th>
+      <th>statistic</th>
+      <th>p_value</th>
+      <th>comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Likelihood-ratio vs intercept-only</td>
+      <td>0.0000</td>
+      <td>1.0000</td>
+      <td>Tests whether the fitted indicators improve log-likelihood over a null model.</td>
+    </tr>
+    <tr>
+      <td>Kolmogorov-Smirnov score separation</td>
+      <td>0.4240</td>
+      <td>0.0000</td>
+      <td>Tests whether default and non-default score distributions differ.</td>
+    </tr>
+    <tr>
+      <td>Mann-Whitney score ranking</td>
+      <td>136,448,711.0000</td>
+      <td>0.0000</td>
+      <td>Tests whether defaults tend to receive higher scores than non-defaults.</td>
+    </tr>
+    <tr>
+      <td>Hosmer-Lemeshow calibration</td>
+      <td>7,861.1123</td>
+      <td>0.0000</td>
+      <td>Tests grouped calibration; small p-values suggest calibration mismatch.</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Grouped Dummy LR Tests</h3>
+<p class='note'>No rows to display.</p>
+<h3>Indicator Significance</h3>
+<p class='note'>No rows to display.</p>
+<h3>Calibration Deciles</h3>
+<table class="dataframe calibration-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>decile</th>
+      <th>mean_pred</th>
+      <th>actual_rate</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.0671</td>
+      <td>0.0443</td>
+      <td>3226</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>0.1772</td>
+      <td>0.0592</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.2631</td>
+      <td>0.0639</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.3374</td>
+      <td>0.0974</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.4041</td>
+      <td>0.1321</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0.4678</td>
+      <td>0.1957</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>0.5321</td>
+      <td>0.2716</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>0.6002</td>
+      <td>0.3662</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>0.6774</td>
+      <td>0.4561</td>
+      <td>3225</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>0.7996</td>
+      <td>0.5050</td>
+      <td>3226</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Lift Summary</h3>
+<table class="dataframe lift-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>decile</th>
+      <th>count</th>
+      <th>defaults</th>
+      <th>mean_score</th>
+      <th>default_rate</th>
+      <th>cumulative_defaults</th>
+      <th>cumulative_capture_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>3226</td>
+      <td>1629</td>
+      <td>0.7996</td>
+      <td>0.5050</td>
+      <td>1629</td>
+      <td>0.2305</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>3225</td>
+      <td>1471</td>
+      <td>0.6774</td>
+      <td>0.4561</td>
+      <td>3100</td>
+      <td>0.4386</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3225</td>
+      <td>1181</td>
+      <td>0.6002</td>
+      <td>0.3662</td>
+      <td>4281</td>
+      <td>0.6057</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3225</td>
+      <td>876</td>
+      <td>0.5321</td>
+      <td>0.2716</td>
+      <td>5157</td>
+      <td>0.7296</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3225</td>
+      <td>631</td>
+      <td>0.4678</td>
+      <td>0.1957</td>
+      <td>5788</td>
+      <td>0.8189</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>3225</td>
+      <td>426</td>
+      <td>0.4041</td>
+      <td>0.1321</td>
+      <td>6214</td>
+      <td>0.8792</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>3225</td>
+      <td>314</td>
+      <td>0.3374</td>
+      <td>0.0974</td>
+      <td>6528</td>
+      <td>0.9236</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>3225</td>
+      <td>206</td>
+      <td>0.2631</td>
+      <td>0.0639</td>
+      <td>6734</td>
+      <td>0.9527</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>3225</td>
+      <td>191</td>
+      <td>0.1772</td>
+      <td>0.0592</td>
+      <td>6925</td>
+      <td>0.9798</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>3226</td>
+      <td>143</td>
+      <td>0.0671</td>
+      <td>0.0443</td>
+      <td>7068</td>
+      <td>1.0000</td>
+    </tr>
+  </tbody>
+</table>
+<div class='figure-grid'>
+<figure><img src='model_4_roc_curve.png' alt='ROC Curve'><figcaption><strong>ROC Curve.</strong> Higher curves indicate stronger ranking of defaults above non-defaults.</figcaption></figure>
+<figure><img src='model_4_pr_curve.png' alt='Precision-Recall Curve'><figcaption><strong>Precision-Recall Curve.</strong> Useful when defaults are a minority class because it focuses on positive-class retrieval.</figcaption></figure>
+<figure><img src='model_4_calibration_curve.png' alt='Calibration'><figcaption><strong>Calibration.</strong> Observed rates should track the dashed perfect-calibration line.</figcaption></figure>
+<figure><img src='model_4_score_distribution.png' alt='Score Distribution'><figcaption><strong>Score Distribution.</strong> Good risk scores separate the default and non-default distributions.</figcaption></figure>
+<figure><img src='model_4_confusion_matrix.png' alt='Confusion Matrix'><figcaption><strong>Confusion Matrix.</strong> Counts are computed at the selected operating threshold.</figcaption></figure>
+<figure><img src='model_4_lift_curve.png' alt='Lift'><figcaption><strong>Lift.</strong> The first deciles should capture a disproportionate share of defaults.</figcaption></figure>
+<figure><img src='model_4_statistical_tests.png' alt='Statistical Tests'><figcaption><strong>Statistical Tests.</strong> Longer bars mean smaller p-values and stronger evidence against the null.</figcaption></figure>
 </div>
 </section>
 </main>

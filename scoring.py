@@ -6,6 +6,14 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 
 
+SCORING_CATEGORICAL_FEATURES = [
+    "person_home_ownership",
+    "loan_intent",
+    "loan_grade",
+    "cb_person_default_on_file",
+]
+
+
 def _prepare_scoring_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["emp_length_missing"] = df["person_emp_length"].isna().astype(int)
@@ -37,13 +45,7 @@ def _prepare_scoring_features(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df[predictors + ["loan_status"]].dropna()
 
-    categorical_features = [
-        "person_home_ownership",
-        "loan_intent",
-        "loan_grade",
-        "cb_person_default_on_file",
-    ]
-    df = pd.get_dummies(df, columns=categorical_features, drop_first=True)
+    df = pd.get_dummies(df, columns=SCORING_CATEGORICAL_FEATURES, drop_first=True)
     return df, predictors
 
 
@@ -55,11 +57,15 @@ def prepare_scoring_data(
     return data.drop(columns=[target]), data[target].astype(int)
 
 
-def fit_logit_scoring_model(X: pd.DataFrame, y: pd.Series) -> LogisticRegression:
+def fit_logit_scoring_model(
+    X: pd.DataFrame,
+    y: pd.Series,
+    sample_weight: Optional[pd.Series] = None,
+) -> LogisticRegression:
     model = LogisticRegression(C=1e12, solver="lbfgs", max_iter=1000)
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=ConvergenceWarning)
-        model.fit(X, y)
+        model.fit(X, y, sample_weight=sample_weight)
     return model
 
 
@@ -89,3 +95,14 @@ def predictor_list_from_coefficients(coefficients: pd.Series, top_n: int = 20) -
         }
     )
     return summary.sort_values("abs_coefficient", ascending=False).head(top_n)
+
+
+def dummy_feature_groups(X: pd.DataFrame) -> dict[str, list[str]]:
+    """Return one-hot encoded feature families for grouped LR tests."""
+    groups = {}
+    for feature in SCORING_CATEGORICAL_FEATURES:
+        prefix = f"{feature}_"
+        columns = [column for column in X.columns if column.startswith(prefix)]
+        if columns:
+            groups[feature] = columns
+    return groups

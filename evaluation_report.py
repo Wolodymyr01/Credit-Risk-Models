@@ -155,6 +155,92 @@ def _table_html(df: pd.DataFrame, class_name: str) -> str:
     return display.to_html(index=False, classes=class_name, border=0, escape=True)
 
 
+def _cross_validation_html(cross_validation: Optional[Iterable[Dict[str, object]]]) -> str:
+    if not cross_validation:
+        return ""
+    cv_results = list(cross_validation)
+    if not cv_results:
+        return ""
+
+    summary = pd.concat([result["summary"] for result in cv_results], ignore_index=True)
+    folds = pd.concat([result["folds"] for result in cv_results], ignore_index=True)
+    selected_metrics = ["roc_auc", "average_precision", "brier_score", "ks_statistic", "f1_score"]
+    compact_rows = []
+    for _, row in summary[summary["metric"].isin(selected_metrics)].iterrows():
+        compact_rows.append(
+            {
+                "model": row["model"],
+                "metric": row["metric"],
+                "mean": row["mean"],
+                "std": row["std"],
+                "min": row["min"],
+                "max": row["max"],
+            }
+        )
+
+    return (
+        "<section><h2>Cross-Validation</h2>"
+        "<p class='note'>Stratified folds estimate out-of-sample stability. Higher is better except for Brier score.</p>"
+        f"{_table_html(pd.DataFrame(compact_rows), 'cv-summary-table')}"
+        "<h3>Fold Results</h3>"
+        f"{_table_html(folds, 'cv-folds-table')}"
+        "</section>"
+    )
+
+
+def _sampling_diagnostics_html(sampling_diagnostics: Optional[Dict[str, object]]) -> str:
+    if not sampling_diagnostics:
+        return ""
+    parts = ["<section><h2>Sampling and Weighting Diagnostics</h2>"]
+    representative = sampling_diagnostics.get("representative", {})
+    if representative:
+        parts.extend(
+            [
+                "<h3>Representative Sample</h3>",
+                (
+                    "<p class='note'>"
+                    f"Sampled {representative['sample_size']:,} of {representative['full_size']:,} rows "
+                    f"({representative['sample_share']:.1%}) using stratified proportional sampling."
+                    "</p>"
+                ),
+                _table_html(representative["strata"].head(20), "sampling-strata-table"),
+                "<h3>Numeric Balance</h3>",
+                _table_html(representative["numeric_balance"], "numeric-balance-table"),
+            ]
+        )
+    weighted = sampling_diagnostics.get("weighted", {})
+    if weighted:
+        parts.extend(
+            [
+                "<h3>Inverse-Frequency Weights</h3>",
+                (
+                    "<p class='note'>"
+                    f"Mean weight {weighted['mean_weight']:.4f}; min {weighted['min_weight']:.4f}; "
+                    f"max {weighted['max_weight']:.4f}; effective sample size {weighted['effective_sample_size']:.0f}."
+                    "</p>"
+                ),
+                _table_html(weighted["strata"].head(20), "weight-strata-table"),
+            ]
+        )
+    parts.append("</section>")
+    return "".join(parts)
+
+
+def _segment_performance_html(segment_performance: Optional[pd.DataFrame]) -> str:
+    if segment_performance is None or segment_performance.empty:
+        return ""
+    display = segment_performance.sort_values(
+        ["segment", "value", "model"],
+        key=lambda values: values.astype(str),
+    )
+    return (
+        "<section><h2>Segment Stability</h2>"
+        "<p class='note'>Segment metrics show whether sampling or weighting improves stability across portfolio groups.</p>"
+        f"{_table_html(display, 'segment-performance-table')}"
+        "</section>"
+    )
+
+
 def _metric_cards(metrics: Dict[str, float]) -> str:
     featured = [
         ("ROC AUC", metrics["roc_auc"], "Ranking quality"),
@@ -180,16 +266,22 @@ def _metric_cards(metrics: Dict[str, float]) -> str:
 def _commentary(evaluation: Dict[str, object]) -> str:
     metrics = evaluation["metrics"]
     non_significant = evaluation.get("non_significant_predictors", [])
+    non_significant_groups = evaluation.get("non_significant_groups", [])
     tests = evaluation.get("global_tests", pd.DataFrame())
     hl = tests.loc[tests["test"].eq("Hosmer-Lemeshow calibration"), "p_value"]
     calibration_comment = "Grouped calibration does not show a statistically significant mismatch."
     if not hl.empty and hl.iloc[0] < 0.05:
         calibration_comment = "Grouped calibration is statistically imperfect; score calibration should be monitored before deployment."
-    significance_comment = (
-        f"{len(non_significant)} indicators are not significant at alpha 0.05 and are candidates for an adjusted model."
-        if non_significant
-        else "All fitted indicators pass the alpha 0.05 Wald screen."
-    )
+    significance_parts = []
+    if non_significant_groups:
+        significance_parts.append(
+            f"{len(non_significant_groups)} dummy-variable groups fail the LR screen and are candidates for grouped removal."
+        )
+    if non_significant:
+        significance_parts.append(
+            f"{len(non_significant)} ungrouped indicators fail the Wald screen."
+        )
+    significance_comment = " ".join(significance_parts) if significance_parts else "Grouped LR and ungrouped Wald screens do not flag removable indicators."
     return (
         "<div class='comment-box'>"
         f"<p><strong>Model read:</strong> ROC AUC is {_format_float(metrics['roc_auc'])}, "
@@ -262,6 +354,8 @@ def _render_model_section(evaluation: Dict[str, object], save_dir: str, prefix: 
         _table_html(metrics_table, "metrics-table"),
         "<h3>Statistical Tests</h3>",
         _table_html(evaluation["global_tests"], "tests-table"),
+        "<h3>Grouped Dummy LR Tests</h3>",
+        _table_html(evaluation.get("group_likelihood_ratio_tests", pd.DataFrame()), "group-tests-table"),
         "<h3>Indicator Significance</h3>",
         _table_html(coefficients, "coefficients-table"),
         "<h3>Calibration Deciles</h3>",
@@ -286,6 +380,9 @@ def create_html_evaluation_report(
     save_dir: str = "evaluation",
     report_name: str = "evaluation_report.html",
     comparison: Optional[pd.DataFrame] = None,
+    cross_validation: Optional[Iterable[Dict[str, object]]] = None,
+    sampling_diagnostics: Optional[Dict[str, object]] = None,
+    segment_performance: Optional[pd.DataFrame] = None,
 ) -> str:
     os.makedirs(save_dir, exist_ok=True)
     if isinstance(evaluations, dict):
@@ -302,7 +399,7 @@ def create_html_evaluation_report(
     if comparison is not None and not comparison.empty:
         comparison_html = (
             "<section><h2>Model Comparison</h2>"
-            "<p class='note'>The adjusted model is fitted after removing indicators that failed the Wald significance screen.</p>"
+            "<p class='note'>The adjusted model removes whole dummy-variable groups that fail nested likelihood-ratio tests, plus ungrouped indicators that fail the Wald screen.</p>"
             f"{_table_html(comparison, 'comparison-table')}"
             "</section>"
         )
@@ -344,9 +441,12 @@ def create_html_evaluation_report(
         "</style>",
         "</head>",
         "<body>",
-        "<header><h1>Model Evaluation Report</h1><p class='note'>Classification performance, statistical diagnostics, indicator significance, and adjusted-model comparison.</p></header>",
+        "<header><h1>Model Evaluation Report</h1><p class='note'>Classification performance, statistical diagnostics, grouped dummy-variable tests, indicator significance, and adjusted-model comparison.</p></header>",
         "<main>",
         comparison_html,
+        _sampling_diagnostics_html(sampling_diagnostics),
+        _cross_validation_html(cross_validation),
+        _segment_performance_html(segment_performance),
         *model_sections,
         "</main>",
         "</body>",
