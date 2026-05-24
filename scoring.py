@@ -9,23 +9,25 @@ from sklearn.linear_model import LogisticRegression
 SCORING_CATEGORICAL_FEATURES = [
     "person_home_ownership",
     "loan_intent",
-    "loan_grade",
     "cb_person_default_on_file",
+]
+
+EXCLUDED_ACADEMIC_MODEL_FEATURES = [
+    "loan_grade",
 ]
 
 
 def _prepare_scoring_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df["emp_length_missing"] = df["person_emp_length"].isna().astype(int)
-    df["int_rate_missing"] = df["loan_int_rate"].isna().astype(int)
-    df["emp_length"] = df["person_emp_length"].fillna(0)
+    if "emp_length_missing" not in df.columns:
+        df["emp_length_missing"] = df["person_emp_length"].isna().astype(int)
+    if "int_rate_missing" not in df.columns:
+        df["int_rate_missing"] = df["loan_int_rate"].isna().astype(int)
+    if "emp_length" not in df.columns:
+        df["emp_length"] = df["person_emp_length"].fillna(0)
 
-    grade_median_int_rate = df.groupby("loan_grade")["loan_int_rate"].median()
-    df["loan_int_rate"] = df.apply(
-        lambda row: grade_median_int_rate[row["loan_grade"]]
-        if pd.isna(row["loan_int_rate"]) else row["loan_int_rate"],
-        axis=1,
-    )
+    if df["loan_int_rate"].isna().any():
+        df["loan_int_rate"] = df["loan_int_rate"].fillna(df["loan_int_rate"].median())
 
     predictors = [
         "person_age",
@@ -39,7 +41,6 @@ def _prepare_scoring_features(df: pd.DataFrame) -> pd.DataFrame:
         "int_rate_missing",
         "person_home_ownership",
         "loan_intent",
-        "loan_grade",
         "cb_person_default_on_file",
     ]
 

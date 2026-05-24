@@ -71,6 +71,30 @@ def _plot_data_quality_tests(data_tests: pd.DataFrame, save_path: str, show: boo
     plt.close(fig)
 
 
+def _plot_loan_grade_target_association(default_rates: pd.DataFrame, save_path: str, show: bool) -> None:
+    if default_rates.empty:
+        return
+
+    fig, ax1 = plt.subplots(figsize=(9, 5))
+    ax2 = ax1.twinx()
+    ax1.bar(default_rates["loan_grade"], default_rates["count"], color="#8aa6c8", alpha=0.75, label="Applications")
+    ax2.plot(default_rates["loan_grade"], default_rates["default_rate"], color="#b84a52", marker="o", linewidth=2.2, label="Default rate")
+    ax1.set_title("Loan Grade vs Loan Status")
+    ax1.set_xlabel("Loan grade")
+    ax1.set_ylabel("Application count")
+    ax2.set_ylabel("Default rate")
+    ax2.set_ylim(0, min(1.05, max(default_rates["default_rate"].max() * 1.15, 0.2)))
+    ax1.grid(True, axis="y", linestyle="--", alpha=0.35)
+    lines, labels = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines + lines2, labels + labels2, frameon=False, loc="upper left")
+    plt.tight_layout()
+    fig.savefig(save_path)
+    if show:
+        plt.show()
+    plt.close(fig)
+
+
 def _render_dataframe_html(title: str, df_summary: pd.DataFrame) -> str:
     body = f"<section><h2>{title}</h2>"
     body += df_summary.reset_index().to_html(
@@ -126,11 +150,20 @@ def _create_plots(df: pd.DataFrame, analysis: Dict[str, object], save_dir: str, 
 
     tests_image = os.path.join(save_dir, "data_quality_tests.png")
     _plot_data_quality_tests(analysis["data_quality_tests"], tests_image, show=False)
+    loan_grade_image = os.path.join(save_dir, "loan_grade_target_association.png")
+    loan_grade_association = analysis.get("loan_grade_target_association", {})
+    if loan_grade_association:
+        _plot_loan_grade_target_association(
+            loan_grade_association["default_rates"],
+            loan_grade_image,
+            show=show,
+        )
 
     return {
         "numeric": numeric_images,
         "categorical": categorical_images,
         "data_quality_tests": tests_image,
+        "loan_grade_target_association": loan_grade_image,
     }
 
 
@@ -152,6 +185,7 @@ def create_eda_report(
     categorical_stats = analysis["categorical_summary"]
     outlier_stats = analysis["outlier_summary"]
     data_tests = analysis["data_quality_tests"]
+    loan_grade_association = analysis.get("loan_grade_target_association", {})
     report_path = os.path.join(save_dir, report_name)
 
     html = [
@@ -216,6 +250,36 @@ def create_eda_report(
         html.append("</section>")
 
     html.append(_eda_recommendations_html())
+
+    if loan_grade_association:
+        html.append("<section><h2>Loan Grade Target Association</h2>")
+        html.append(
+            "<p>Loan grade behaves like a prepared external risk estimate. The association below is used to justify excluding it from academic models.</p>"
+        )
+        html.append(
+            loan_grade_association["metrics"].to_html(
+                classes="summary-table",
+                index=False,
+                border=0,
+                justify="center",
+                escape=True,
+            )
+        )
+        html.append(
+            loan_grade_association["default_rates"].to_html(
+                classes="summary-table",
+                index=False,
+                border=0,
+                justify="center",
+                escape=True,
+            )
+        )
+        loan_grade_image = image_paths["loan_grade_target_association"]
+        if os.path.exists(loan_grade_image):
+            html.append(
+                f"<figure><img src=\"{os.path.basename(loan_grade_image)}\" alt=\"Loan grade target association\"><figcaption>Default rate rises sharply by loan grade.</figcaption></figure>"
+            )
+        html.append("</section>")
 
     if image_paths["numeric"]:
         html.append(_image_section_html("Numeric Feature Visualizations", image_paths["numeric"]))

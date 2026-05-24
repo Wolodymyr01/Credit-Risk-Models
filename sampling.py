@@ -4,7 +4,6 @@ import pandas as pd
 
 REPRESENTATIVE_STRATA = [
     "loan_status",
-    "loan_grade",
     "loan_intent",
     "person_home_ownership",
 ]
