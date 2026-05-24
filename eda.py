@@ -263,6 +263,52 @@ def run_data_quality_tests(df: pd.DataFrame, target_column: str = "loan_status")
     return pd.DataFrame(checks)
 
 
+def loan_grade_target_association(df: pd.DataFrame, target_column: str = "loan_status") -> Dict[str, object]:
+    if "loan_grade" not in df.columns or target_column not in df.columns:
+        return {}
+
+    data = df[["loan_grade", target_column]].dropna()
+    if data.empty:
+        return {}
+
+    contingency = pd.crosstab(data["loan_grade"], data[target_column])
+    chi2, p_value, degrees_of_freedom, _ = stats.chi2_contingency(contingency)
+    sample_size = contingency.to_numpy().sum()
+    min_dimension = min(contingency.shape[0] - 1, contingency.shape[1] - 1)
+    cramers_v = float(np.sqrt(chi2 / (sample_size * min_dimension))) if min_dimension > 0 else np.nan
+
+    grade_order = {grade: index + 1 for index, grade in enumerate(sorted(data["loan_grade"].unique()))}
+    spearman = stats.spearmanr(data["loan_grade"].map(grade_order), data[target_column])
+    default_rates = (
+        data.groupby("loan_grade")[target_column]
+        .agg(count="count", default_rate="mean")
+        .reset_index()
+        .sort_values("loan_grade")
+    )
+    default_rate_range = float(default_rates["default_rate"].max() - default_rates["default_rate"].min())
+
+    return {
+        "metrics": pd.DataFrame(
+            [
+                {
+                    "feature": "loan_grade",
+                    "target": target_column,
+                    "cramers_v": cramers_v,
+                    "chi2_statistic": float(chi2),
+                    "chi2_p_value": float(p_value),
+                    "chi2_degrees_of_freedom": int(degrees_of_freedom),
+                    "spearman_r": float(spearman.statistic),
+                    "spearman_p_value": float(spearman.pvalue),
+                    "default_rate_range": default_rate_range,
+                    "interpretation": "strong proxy-risk relationship; exclude from academic models",
+                }
+            ]
+        ),
+        "default_rates": default_rates,
+        "contingency": contingency,
+    }
+
+
 def analyze_eda(
     df: pd.DataFrame,
     category_threshold: int = 10,
@@ -279,6 +325,7 @@ def analyze_eda(
         "categorical_summary": categorical_summary(df, categorical_columns),
         "outlier_summary": bonferroni_outlier_summary(df, numeric_columns),
         "data_quality_tests": run_data_quality_tests(df, target_column=target_column),
+        "loan_grade_target_association": loan_grade_target_association(df, target_column=target_column),
     }
 
 

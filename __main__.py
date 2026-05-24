@@ -15,6 +15,7 @@ from sampling import (
 from scoring import (
     build_logit_scoring_model,
     dummy_feature_groups,
+    EXCLUDED_ACADEMIC_MODEL_FEATURES,
     fit_logit_scoring_model,
     predictor_list_from_coefficients,
     prepare_scoring_data,
@@ -29,13 +30,8 @@ def clean_credit_risk_data(df: pd.DataFrame) -> pd.DataFrame:
     df["int_rate_missing"] = df["loan_int_rate"].isna().astype(int)
     df["emp_length"] = df["person_emp_length"].fillna(0)
 
-    # Interest-rate missingness is weakly target-related; grade-level medians preserve risk ordering.
-    grade_median_int_rate = df.groupby("loan_grade")["loan_int_rate"].median()
-    df["loan_int_rate"] = df.apply(
-        lambda row: grade_median_int_rate[row["loan_grade"]]
-        if pd.isna(row["loan_int_rate"]) else row["loan_int_rate"],
-        axis=1,
-    )
+    # Loan grade is treated as an external risk estimate, so interest-rate imputation avoids grade-level medians.
+    df["loan_int_rate"] = df["loan_int_rate"].fillna(df["loan_int_rate"].median())
 
     # These rows are implausible for consumer-credit modeling and distort age/employment diagnostics.
     df = df[df["person_age"] <= 120]
@@ -60,6 +56,11 @@ def adjusted_features_from_significance(full_evaluation: dict, all_features: lis
     return adjusted_features, removed_features
 
 
+def remove_academic_excluded_features(df: pd.DataFrame) -> pd.DataFrame:
+    excluded_columns = [column for column in EXCLUDED_ACADEMIC_MODEL_FEATURES if column in df.columns]
+    return df.drop(columns=excluded_columns)
+
+
 def main() -> None:
     credit_risk_df = pd.read_csv("credit_risk_dataset.csv")
     raw_eda = analyze_eda(credit_risk_df)
@@ -71,14 +72,17 @@ def main() -> None:
     cleaned_eda_report = create_eda_report(cleaned_df, cleaned_eda, save_dir="eda_plots/cleaned")
     print(f"Cleaned EDA report saved to: {cleaned_eda_report}")
 
-    scoring_model, scoring_predictors, scoring_coefficients = build_logit_scoring_model(cleaned_df)
+    modeling_df = remove_academic_excluded_features(cleaned_df)
+    print(f"Academic excluded columns removed from modeling dataframe: {EXCLUDED_ACADEMIC_MODEL_FEATURES}")
+
+    scoring_model, scoring_predictors, scoring_coefficients = build_logit_scoring_model(modeling_df)
     print("Top model indicators by absolute coefficient:")
     print(predictor_list_from_coefficients(scoring_coefficients).to_string())
     print("\nOrdered predictors:")
     print(scoring_predictors)
 
-    X, y = prepare_scoring_data(cleaned_df)
-    scoring_df = cleaned_df.loc[X.index]
+    X, y = prepare_scoring_data(modeling_df)
+    scoring_df = modeling_df.loc[X.index]
     feature_groups = dummy_feature_groups(X)
     full_evaluation = evaluate_model_results(
         scoring_model,
@@ -233,7 +237,7 @@ def main() -> None:
     segment_metrics = segment_performance(
         evaluations,
         scoring_df,
-        ["loan_grade", "loan_intent", "person_home_ownership"],
+        ["loan_intent", "person_home_ownership"],
     )
 
     report_path = create_html_evaluation_report(

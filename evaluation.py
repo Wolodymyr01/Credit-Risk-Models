@@ -43,6 +43,15 @@ def _log_loss_parts(y_true: pd.Series, y_score: np.ndarray) -> tuple[float, floa
     return ll_model, ll_null
 
 
+def _design_matrix_rank(X: pd.DataFrame) -> int:
+    design = np.column_stack([np.ones(X.shape[0]), X.to_numpy(dtype=float)])
+    return int(np.linalg.matrix_rank(design))
+
+
+def _model_degrees_of_freedom(X: pd.DataFrame) -> int:
+    return max(_design_matrix_rank(X) - 1, 1)
+
+
 def _hosmer_lemeshow_test(y_true: pd.Series, y_score: np.ndarray, bins: int = 10) -> Dict[str, object]:
     data = pd.DataFrame({"y_true": y_true.to_numpy(), "y_score": y_score})
     data["group"] = pd.qcut(data["y_score"], bins, labels=False, duplicates="drop")
@@ -54,24 +63,26 @@ def _hosmer_lemeshow_test(y_true: pd.Series, y_score: np.ndarray, bins: int = 10
             expected_defaults=("y_score", "sum"),
             mean_score=("y_score", "mean"),
         )
-        .reset_index(drop=True)
+        .reset_index()
     )
     grouped["observed_non_defaults"] = grouped["count"] - grouped["observed_defaults"]
     grouped["expected_non_defaults"] = grouped["count"] - grouped["expected_defaults"]
 
     eps = np.finfo(float).eps
-    statistic = float(
-        (
-            ((grouped["observed_defaults"] - grouped["expected_defaults"]) ** 2)
-            / np.maximum(grouped["expected_defaults"], eps)
-        ).sum()
-        + (
-            ((grouped["observed_non_defaults"] - grouped["expected_non_defaults"]) ** 2)
-            / np.maximum(grouped["expected_non_defaults"], eps)
-        ).sum()
-    )
+    grouped["default_chi2_component"] = (
+        (grouped["observed_defaults"] - grouped["expected_defaults"]) ** 2
+    ) / np.maximum(grouped["expected_defaults"], eps)
+    grouped["non_default_chi2_component"] = (
+        (grouped["observed_non_defaults"] - grouped["expected_non_defaults"]) ** 2
+    ) / np.maximum(grouped["expected_non_defaults"], eps)
+    grouped["hl_chi2_component"] = grouped["default_chi2_component"] + grouped["non_default_chi2_component"]
+    grouped["hl_component_p_value"] = stats.chi2.sf(grouped["hl_chi2_component"], 1)
+    statistic = float(grouped["hl_chi2_component"].sum())
     degrees_of_freedom = max(int(grouped.shape[0] - 2), 1)
     p_value = float(stats.chi2.sf(statistic, degrees_of_freedom))
+    grouped["hl_overall_statistic"] = statistic
+    grouped["hl_overall_degrees_of_freedom"] = degrees_of_freedom
+    grouped["hl_overall_p_value"] = p_value
     return {
         "statistic": statistic,
         "p_value": p_value,
@@ -124,11 +135,11 @@ def _coefficient_significance(
 def _global_statistical_tests(
     y_true: pd.Series,
     y_score: np.ndarray,
-    number_of_predictors: int,
+    model_degrees_of_freedom: int,
 ) -> pd.DataFrame:
     ll_model, ll_null = _log_loss_parts(y_true, y_score)
     lr_statistic = max(2 * (ll_model - ll_null), 0.0)
-    lr_p_value = float(stats.chi2.sf(lr_statistic, max(number_of_predictors, 1)))
+    lr_p_value = float(stats.chi2.sf(lr_statistic, max(model_degrees_of_freedom, 1)))
 
     defaults = y_score[np.asarray(y_true) == 1]
     non_defaults = y_score[np.asarray(y_true) == 0]
@@ -198,10 +209,11 @@ def likelihood_ratio_group_tests(
 ) -> pd.DataFrame:
     """Test whether grouped indicators can be removed using nested-model LR tests."""
     if not feature_groups:
-        return pd.DataFrame(columns=["group", "features", "df", "lr_statistic", "p_value", "significant", "action"])
+        return pd.DataFrame(columns=["group", "features", "columns_removed", "df", "lr_statistic", "p_value", "significant", "action"])
 
     full_score = _prediction_scores(model, X)
     full_ll, _ = _log_loss_parts(y, full_score)
+    full_rank = _design_matrix_rank(X)
     rows = []
     for group_name, group_features in feature_groups.items():
         removable_features = [feature for feature in group_features if feature in X.columns]
@@ -209,17 +221,21 @@ def likelihood_ratio_group_tests(
             continue
 
         reduced_features = [feature for feature in X.columns if feature not in removable_features]
+        reduced_rank = _design_matrix_rank(X[reduced_features])
+        degrees_of_freedom = full_rank - reduced_rank
+        if degrees_of_freedom <= 0:
+            continue
         reduced_model = _fit_reduced_model(model, X[reduced_features], y)
         reduced_score = _prediction_scores(reduced_model, X[reduced_features])
         reduced_ll, _ = _log_loss_parts(y, reduced_score)
         lr_statistic = max(2 * (full_ll - reduced_ll), 0.0)
-        degrees_of_freedom = len(removable_features)
         p_value = float(stats.chi2.sf(lr_statistic, degrees_of_freedom))
         significant = p_value < alpha
         rows.append(
             {
                 "group": group_name,
                 "features": ", ".join(removable_features),
+                "columns_removed": len(removable_features),
                 "df": degrees_of_freedom,
                 "lr_statistic": lr_statistic,
                 "p_value": p_value,
@@ -401,7 +417,7 @@ def evaluate_model_results(
     group_lr_tests = (
         likelihood_ratio_group_tests(model, X, y, feature_groups or {}, alpha=alpha)
         if run_model_diagnostics
-        else pd.DataFrame(columns=["group", "features", "df", "lr_statistic", "p_value", "significant", "action"])
+        else pd.DataFrame(columns=["group", "features", "columns_removed", "df", "lr_statistic", "p_value", "significant", "action"])
     )
     non_significant_groups = (
         group_lr_tests.loc[~group_lr_tests["significant"], "group"].tolist()
@@ -410,7 +426,25 @@ def evaluate_model_results(
     )
 
     hosmer_lemeshow = _hosmer_lemeshow_test(y, y_score)
-    global_tests = _global_statistical_tests(y, y_score, X.shape[1])
+    calibration = calibration.merge(
+        hosmer_lemeshow["groups"][
+            [
+                "group",
+                "observed_defaults",
+                "expected_defaults",
+                "observed_non_defaults",
+                "expected_non_defaults",
+                "hl_chi2_component",
+                "hl_component_p_value",
+                "hl_overall_p_value",
+            ]
+        ].rename(columns={"group": "decile"}),
+        on="decile",
+        how="left",
+    )
+    parameter_count = _design_matrix_rank(X)
+    model_df = _model_degrees_of_freedom(X)
+    global_tests = _global_statistical_tests(y, y_score, model_df)
     global_tests = pd.concat(
         [
             global_tests,
@@ -428,10 +462,12 @@ def evaluate_model_results(
         ignore_index=True,
     )
 
-    fit_statistics = _model_fit_statistics(y, y_score, X.shape[1] + 1)
+    fit_statistics = _model_fit_statistics(y, y_score, parameter_count)
     classification_metrics = _classification_metrics(y, y_score, threshold=threshold)
     metrics = {
         **classification_metrics,
+        "parameter_count": parameter_count,
+        "model_degrees_of_freedom": model_df,
         "specificity": tn / (tn + fp) if tn + fp > 0 else 0.0,
         "threshold": threshold,
         "optimal_ks_threshold": optimal_threshold,

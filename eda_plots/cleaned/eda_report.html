@@ -105,13 +105,13 @@ figcaption { text-align: center; font-size: 0.9em; margin-top: 6px; color: #555;
       <td>0</td>
       <td>0.000000</td>
       <td>5.42</td>
-      <td>7.88</td>
+      <td>8.49</td>
       <td>10.99</td>
-      <td>11.005570</td>
-      <td>13.48</td>
+      <td>11.001223</td>
+      <td>13.11</td>
       <td>23.22</td>
-      <td>3.210127</td>
-      <td>0.212362</td>
+      <td>3.078971</td>
+      <td>0.221152</td>
     </tr>
     <tr>
       <td>loan_percent_income</td>
@@ -387,6 +387,86 @@ figcaption { text-align: center; font-size: 0.9em; margin-top: 6px; color: #555;
 <figure><img src="data_quality_tests.png" alt="Data quality tests"><figcaption>Data quality test findings by affected rows.</figcaption></figure>
 </section>
 <section><h2>Suggested EDA Improvements</h2><ul class="recommendations"><li>Add target-aware EDA: default rate by loan grade, home ownership, intent, and missingness indicators.</li><li>Track data-quality tests over time so new extracts fail fast when plausibility checks regress.</li><li>Add bivariate numeric plots against loan_status, especially income, interest rate, loan-to-income, and credit history.</li><li>Review outliers with business rules before deletion; age above 120 and impossible employment length should be quarantined.</li><li>Use stratified train/test validation after EDA so performance estimates are not only in-sample.</li></ul></section>
+<section><h2>Loan Grade Target Association</h2>
+<p>Loan grade behaves like a prepared external risk estimate. The association below is used to justify excluding it from academic models.</p>
+<table class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: center;">
+      <th>feature</th>
+      <th>target</th>
+      <th>cramers_v</th>
+      <th>chi2_statistic</th>
+      <th>chi2_p_value</th>
+      <th>chi2_degrees_of_freedom</th>
+      <th>spearman_r</th>
+      <th>spearman_p_value</th>
+      <th>default_rate_range</th>
+      <th>interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>loan_grade</td>
+      <td>loan_status</td>
+      <td>0.415355</td>
+      <td>5564.096658</td>
+      <td>0.0</td>
+      <td>6</td>
+      <td>0.333141</td>
+      <td>0.0</td>
+      <td>0.883931</td>
+      <td>strong proxy-risk relationship; exclude from academic models</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: center;">
+      <th>loan_grade</th>
+      <th>count</th>
+      <th>default_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A</td>
+      <td>10699</td>
+      <td>0.100196</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td>10347</td>
+      <td>0.163816</td>
+    </tr>
+    <tr>
+      <td>C</td>
+      <td>6387</td>
+      <td>0.209331</td>
+    </tr>
+    <tr>
+      <td>D</td>
+      <td>3573</td>
+      <td>0.594179</td>
+    </tr>
+    <tr>
+      <td>E</td>
+      <td>947</td>
+      <td>0.646251</td>
+    </tr>
+    <tr>
+      <td>F</td>
+      <td>236</td>
+      <td>0.707627</td>
+    </tr>
+    <tr>
+      <td>G</td>
+      <td>63</td>
+      <td>0.984127</td>
+    </tr>
+  </tbody>
+</table>
+<figure><img src="loan_grade_target_association.png" alt="Loan grade target association"><figcaption>Default rate rises sharply by loan grade.</figcaption></figure>
+</section>
 <section><h2>Numeric Feature Visualizations</h2>
 <figure><img src="person_age_numeric.png" alt="person_age_numeric.png"><figcaption>person_age_numeric.png</figcaption></figure>
 <figure><img src="person_income_numeric.png" alt="person_income_numeric.png"><figcaption>person_income_numeric.png</figcaption></figure>
