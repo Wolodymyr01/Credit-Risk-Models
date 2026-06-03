@@ -18,7 +18,16 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
+
+from thresholding import (
+    ProfitLossConfig,
+    ThresholdStrategy,
+    compare_threshold_strategies,
+    profit_at_threshold,
+    recommend_threshold_strategy,
+    resolve_threshold_strategy,
+)
 
 
 def _prediction_scores(model, X: pd.DataFrame) -> np.ndarray:
@@ -246,10 +255,17 @@ def likelihood_ratio_group_tests(
     return pd.DataFrame(rows).sort_values("p_value", ascending=False)
 
 
-def _classification_metrics(y_true: pd.Series, y_score: np.ndarray, threshold: float) -> Dict[str, float]:
+def _classification_metrics(
+    y_true: pd.Series,
+    y_score: np.ndarray,
+    threshold: float,
+    profit_loss: ProfitLossConfig | None = None,
+) -> Dict[str, float]:
     y_pred = (y_score >= threshold).astype(int)
     fpr, tpr, _ = roc_curve(y_true, y_score)
     ks = float(np.max(np.abs(tpr - fpr))) if len(fpr) and len(tpr) else 0.0
+    profit_loss = profit_loss or ProfitLossConfig()
+    expected_profit = profit_at_threshold(y_true, y_score, threshold, profit_loss)
     return {
         "roc_auc": roc_auc_score(y_true, y_score),
         "average_precision": average_precision_score(y_true, y_score),
@@ -259,7 +275,24 @@ def _classification_metrics(y_true: pd.Series, y_score: np.ndarray, threshold: f
         "precision": precision_score(y_true, y_pred, zero_division=0),
         "recall": recall_score(y_true, y_pred, zero_division=0),
         "f1_score": f1_score(y_true, y_pred, zero_division=0),
+        "expected_profit": expected_profit,
+        "expected_profit_per_case": expected_profit / max(len(y_true), 1),
     }
+
+
+def _select_threshold(
+    y_true: pd.Series,
+    y_score: np.ndarray,
+    threshold_strategy: str | ThresholdStrategy,
+    profit_loss: ProfitLossConfig,
+) -> tuple[float, str, pd.DataFrame, str]:
+    comparison = compare_threshold_strategies(y_true, y_score, profit_loss=profit_loss)
+    recommended_strategy = recommend_threshold_strategy(comparison)
+    if threshold_strategy == "recommended":
+        threshold_strategy = recommended_strategy
+    strategy = resolve_threshold_strategy(threshold_strategy)
+    result = strategy(y_true, y_score, profit_loss)
+    return float(result["threshold"]), str(result["strategy"]), comparison, recommended_strategy
 
 
 def cross_validate_model(
@@ -268,16 +301,19 @@ def cross_validate_model(
     y: pd.Series,
     model_name: str,
     n_splits: int = 5,
-    threshold: float = 0.5,
+    threshold_strategy: str | ThresholdStrategy = "youden_j",
+    profit_loss: ProfitLossConfig | None = None,
     random_state: int = 42,
     sample_weight: pd.Series | None = None,
     train_index_selector=None,
     train_weight_provider=None,
+    fold_transformer_factory=None,
 ) -> Dict[str, pd.DataFrame | str | int]:
     """Run stratified cross-validation and summarize fold-level classification metrics."""
     splitter = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     fold_rows = []
     prediction_parts = []
+    profit_loss = profit_loss or ProfitLossConfig()
 
     for fold_index, (train_index, test_index) in enumerate(splitter.split(X, y), start=1):
         fold_model = clone(model)
@@ -296,13 +332,35 @@ def cross_validate_model(
         if train_weight_provider is not None:
             fold_sample_weight = train_weight_provider(X_train, y_train, fold_index)
 
+        if fold_transformer_factory is not None:
+            fold_transformer = fold_transformer_factory()
+            X_train = fold_transformer.fit_transform(X_train, y_train)
+            X_test = fold_transformer.transform(X_test)
+
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=ConvergenceWarning)
             fold_model.fit(X_train, y_train, sample_weight=fold_sample_weight)
 
+        train_score = _prediction_scores(fold_model, X_train)
+        threshold, strategy_name, _threshold_comparison, recommended_strategy = _select_threshold(
+            y_train,
+            train_score,
+            threshold_strategy,
+            profit_loss,
+        )
         y_score = _prediction_scores(fold_model, X_test)
-        metrics = _classification_metrics(y_test, y_score, threshold=threshold)
-        fold_rows.append({"model": model_name, "fold": fold_index, "n_test": len(test_index), **metrics})
+        metrics = _classification_metrics(y_test, y_score, threshold=threshold, profit_loss=profit_loss)
+        fold_rows.append(
+            {
+                "model": model_name,
+                "fold": fold_index,
+                "n_test": len(test_index),
+                "threshold_strategy": strategy_name,
+                "recommended_threshold_strategy": recommended_strategy,
+                "threshold": threshold,
+                **metrics,
+            }
+        )
         prediction_parts.append(
             pd.DataFrame(
                 {
@@ -325,6 +383,8 @@ def cross_validate_model(
         "precision",
         "recall",
         "f1_score",
+        "expected_profit_per_case",
+        "threshold",
     ]
     summary = (
         folds[metric_columns]
@@ -347,13 +407,32 @@ def evaluate_model_results(
     model,
     X: pd.DataFrame,
     y: pd.Series,
-    threshold: float = 0.5,
+    threshold_strategy: str | ThresholdStrategy = "youden_j",
+    profit_loss: ProfitLossConfig | None = None,
     alpha: float = 0.05,
     model_name: str = "Full model",
     feature_groups: Dict[str, list[str]] | None = None,
     run_model_diagnostics: bool = True,
+    selected_threshold: float | None = None,
+    selected_threshold_strategy: str | None = None,
+    threshold_comparison: pd.DataFrame | None = None,
+    recommended_threshold_strategy: str | None = None,
 ) -> Dict[str, object]:
     y_score = _prediction_scores(model, X)
+    profit_loss = profit_loss or ProfitLossConfig()
+    if selected_threshold is None:
+        threshold, threshold_strategy_name, threshold_comparison, recommended_strategy = _select_threshold(
+            y,
+            y_score,
+            threshold_strategy,
+            profit_loss,
+        )
+    else:
+        threshold = float(selected_threshold)
+        threshold_strategy_name = selected_threshold_strategy or str(threshold_strategy)
+        if threshold_comparison is None:
+            threshold_comparison = compare_threshold_strategies(y, y_score, profit_loss=profit_loss)
+        recommended_strategy = recommended_threshold_strategy or recommend_threshold_strategy(threshold_comparison)
     y_pred = (y_score >= threshold).astype(int)
 
     tn, fp, fn, tp = confusion_matrix(y, y_pred, labels=[0, 1]).ravel()
@@ -463,13 +542,15 @@ def evaluate_model_results(
     )
 
     fit_statistics = _model_fit_statistics(y, y_score, parameter_count)
-    classification_metrics = _classification_metrics(y, y_score, threshold=threshold)
+    classification_metrics = _classification_metrics(y, y_score, threshold=threshold, profit_loss=profit_loss)
     metrics = {
         **classification_metrics,
         "parameter_count": parameter_count,
         "model_degrees_of_freedom": model_df,
         "specificity": tn / (tn + fp) if tn + fp > 0 else 0.0,
         "threshold": threshold,
+        "threshold_strategy": threshold_strategy_name,
+        "recommended_threshold_strategy": recommended_strategy,
         "optimal_ks_threshold": optimal_threshold,
         **fit_statistics,
     }
@@ -481,6 +562,7 @@ def evaluate_model_results(
         "confusion_matrix": pd.DataFrame(
             [[tn, fp], [fn, tp]], columns=["Pred 0", "Pred 1"], index=["Actual 0", "Actual 1"]
         ),
+        "threshold_comparison": threshold_comparison,
         "roc_curve": pd.DataFrame({"fpr": fpr, "tpr": tpr, "threshold": roc_thresholds}),
         "pr_curve": pd.DataFrame({"precision": precision_curve, "recall": recall_curve}).assign(
             threshold=pd.Series(list(pr_thresholds) + [np.nan])
@@ -498,6 +580,75 @@ def evaluate_model_results(
     }
 
 
+def make_train_test_indices(
+    X: pd.DataFrame,
+    y: pd.Series,
+    test_size: float = 0.30,
+    random_state: int = 42,
+) -> tuple[pd.Index, pd.Index]:
+    train_positions, test_positions = train_test_split(
+        np.arange(X.shape[0]),
+        test_size=test_size,
+        stratify=y,
+        random_state=random_state,
+    )
+    return X.index[train_positions], X.index[test_positions]
+
+
+def evaluate_holdout_model(
+    model,
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+    model_name: str,
+    threshold_strategy: str | ThresholdStrategy = "youden_j",
+    profit_loss: ProfitLossConfig | None = None,
+    alpha: float = 0.05,
+    feature_groups: Dict[str, list[str]] | None = None,
+    run_model_diagnostics: bool = False,
+    train_diagnostics: Dict[str, object] | None = None,
+) -> Dict[str, object]:
+    """Evaluate a fitted model on holdout rows using a train-selected threshold."""
+    profit_loss = profit_loss or ProfitLossConfig()
+    train_score = _prediction_scores(model, X_train)
+    threshold, strategy_name, train_threshold_comparison, recommended_strategy = _select_threshold(
+        y_train,
+        train_score,
+        threshold_strategy,
+        profit_loss,
+    )
+    evaluation = evaluate_model_results(
+        model,
+        X_test,
+        y_test,
+        threshold_strategy=threshold_strategy,
+        profit_loss=profit_loss,
+        alpha=alpha,
+        model_name=model_name,
+        feature_groups=feature_groups,
+        run_model_diagnostics=run_model_diagnostics,
+        selected_threshold=threshold,
+        selected_threshold_strategy=strategy_name,
+        threshold_comparison=train_threshold_comparison,
+        recommended_threshold_strategy=recommended_strategy,
+    )
+    evaluation["validation_method"] = "stratified_train_test"
+    evaluation["train_size"] = int(X_train.shape[0])
+    evaluation["test_size"] = int(X_test.shape[0])
+
+    if train_diagnostics is not None:
+        for key in [
+            "coefficient_significance",
+            "group_likelihood_ratio_tests",
+            "non_significant_predictors",
+            "non_significant_groups",
+            "feature_groups",
+        ]:
+            evaluation[key] = train_diagnostics.get(key, evaluation.get(key))
+    return evaluation
+
+
 def compare_evaluations(evaluations: Iterable[Dict[str, object]]) -> pd.DataFrame:
     rows = []
     for evaluation in evaluations:
@@ -510,6 +661,10 @@ def compare_evaluations(evaluations: Iterable[Dict[str, object]]) -> pd.DataFram
                 "average_precision": metrics["average_precision"],
                 "brier_score": metrics["brier_score"],
                 "ks_statistic": metrics["ks_statistic"],
+                "threshold_strategy": metrics["threshold_strategy"],
+                "threshold": metrics["threshold"],
+                "f1_score": metrics["f1_score"],
+                "expected_profit_per_case": metrics["expected_profit_per_case"],
                 "aic": metrics["aic"],
                 "bic": metrics["bic"],
                 "mcfadden_r2": metrics["mcfadden_r2"],
